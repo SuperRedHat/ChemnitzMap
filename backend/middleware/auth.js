@@ -3,16 +3,16 @@ const jwt = require('jsonwebtoken');
 
 // 生成 JWT Token
 const generateToken = (user) => {
-  return jwt.sign(
-    { 
-      id: user.id, 
-      email: user.email,
-      username: user.username,
-      role: user.role 
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+  const payload = {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    role: user.role
+  };
+  
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: '7d' // Token 7天有效
+  });
 };
 
 // 验证 JWT Token 中间件
@@ -26,7 +26,7 @@ const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
-      return res.status(403).json({ error: '认证令牌无效或已过期' });
+      return res.status(403).json({ error: '无效的认证令牌' });
     }
     req.user = user;
     next();

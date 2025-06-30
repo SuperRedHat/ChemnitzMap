@@ -118,6 +118,12 @@ export default {
     let map = null;
     const markers = {};  // site.id -> L.Marker
 
+    // 用户位置相关
+    const userLocation = ref(null);
+    const userLocationMarker = ref(null);
+    const showNearby = ref(false);
+    const nearbyRadius = ref(1000); // 默认1公里
+
     // 初始化地图
     const initMap = () => {
       map = L.map('map-container').setView([50.83, 12.92], 13);
@@ -125,6 +131,24 @@ export default {
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
+
+      // 添加定位控件
+      if ('geolocation' in navigator) {
+        L.control.custom({
+          position: 'topright',
+          content: '<button class="leaflet-bar leaflet-control-custom" title="获取当前位置">📍</button>',
+          classes: '',
+          style: {
+            margin: '10px',
+            cursor: 'pointer'
+          },
+          events: {
+            click: () => {
+              getCurrentLocation();
+            }
+          }
+        }).addTo(map);
+      }
     };
 
     // 更新地图标记
