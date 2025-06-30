@@ -8,6 +8,8 @@ const mysql   = require('mysql2/promise');
 app.use(cors()); 
 app.use(express.json());
 
+
+
 async function createApp() {
  
 
@@ -25,9 +27,12 @@ async function createApp() {
   // 健康检查
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
+
   // 装载路由，并把 db 传进去
   app.use('/api/categories', require('./routes/categories')(db));
   app.use('/api/sites',      require('./routes/sites')(db));
+  app.use('/api/users',      require('./routes/users')(db));
+  app.use('/api/favorites',  require('./routes/favorites')(db));
 
   return app;
 }
