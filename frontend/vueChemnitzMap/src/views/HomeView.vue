@@ -11,18 +11,12 @@
             color: cat.color,
             fontWeight: dataStore.filter.category === cat.name ? 'bold' : 'normal'
           }"
-          @click="() => {
-            dataStore.setCategory(cat.name);
-            if (dataStore.sites[0]) centerAndPopup(dataStore.sites[0]);
-          }"
+          @click="() => handleCategoryClick(cat.name)"
         >
           {{ cat.name }}
         </li>
         <li 
-          @click="() => {
-            dataStore.setCategory('');
-            if (dataStore.sites[0]) centerAndPopup(dataStore.sites[0]);
-          }"
+          @click="() => handleCategoryClick('')"
           :style="{ fontStyle: dataStore.filter.category === '' ? 'italic' : 'normal' }"
         >
           All
@@ -40,7 +34,7 @@
     <!-- 地图 + 列表 -->
     <section class="content-panel">
       <l-map
-        ref="mapRef"
+        @ready="onMapReady"
         :zoom="13"
         :center="mapCenter"
         style="height: 400px; width: 100%;"
@@ -49,11 +43,12 @@
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
+        <!-- 每个 marker 触发 ready 事件，拿到原生实例 -->
         <l-marker
           v-for="site in dataStore.sites"
           :key="site.id"
           :lat-lng="[site.lat, site.lon]"
-          :ref="el => markerRefs[site.id] = el"
+          @ready="marker => onMarkerReady(site.id, marker)"
         >
           <l-popup>
             <strong>{{ site.name }}</strong><br/>
@@ -68,7 +63,7 @@
         <li 
           v-for="site in dataStore.sites" 
           :key="site.id"
-          @click="centerAndPopup(site)"
+          @click="() => centerAndPopup(site.id)"
           style="cursor: pointer;"
         >
           {{ site.name }} ({{ site.category }})
@@ -90,42 +85,65 @@ export default {
     const dataStore = useDataStore();
     const search    = ref('');
     const mapCenter = ref([50.83, 12.92]);
-    const mapRef    = ref(null);
-    const markerRefs = {};  // site.id → Marker 组件实例
+    let mapInstance = null;
+    const markerInstances = {};  // site.id -> L.Marker
 
-    const onSearch = () => {
-      dataStore.setQuery(search.value);
-      // 等待列表和地图重渲染后再操作
-      nextTick(() => {
-        if (dataStore.sites[0]) centerAndPopup(dataStore.sites[0]);
-      });
+    // 后端数据加载完成后，自动居中首条
+    const initCenter = () => {
+      if (dataStore.sites[0] && mapInstance) {
+        centerAndPopup(dataStore.sites[0].id);
+      }
     };
 
-    const centerAndPopup = (site) => {
-      if (!site || !mapRef.value) return;
-      const map  = mapRef.value.mapObject; // Leaflet 地图实例
-      if (!map) return;
+    // 保存原生 L.Map 实例
+    const onMapReady = ({ map }) => {
+      mapInstance = map;
+      initCenter();
+    };
 
+    // 保存原生 L.Marker 实例
+    const onMarkerReady = (id, marker) => {
+      markerInstances[id] = marker;
+    };
+
+    // 点击分类
+    const handleCategoryClick = (category) => {
+      dataStore.setCategory(category);
+      nextTick(initCenter);
+    };
+
+    // 搜索执行
+    const onSearch = () => {
+      dataStore.setQuery(search.value);
+      nextTick(initCenter);
+    };
+
+    // 定位并打开对应 id 的弹窗
+    const centerAndPopup = (siteId) => {
+      const site = dataStore.sites.find(s => s.id === siteId);
+      if (!site || !mapInstance) return;
       const { lat, lon } = site;
-      map.setView([lat, lon], 15, { animate: true });
-
-      // 找到对应的 Marker 组件
-      const markerComp = markerRefs[site.id];
-      if (markerComp && markerComp.mapObject) {
-        markerComp.mapObject.openPopup();
-      }
+      mapInstance.setView([lat, lon], 15, { animate: true });
+      const marker = markerInstances[siteId];
+      if (marker) marker.openPopup();
     };
 
     onMounted(async () => {
       await dataStore.loadCategories();
       await dataStore.loadSites();
-      // 首次加载后把第一个弹出
-      nextTick(() => {
-        if (dataStore.sites[0]) centerAndPopup(dataStore.sites[0]);
-      });
+      nextTick(initCenter);
     });
 
-    return { dataStore, search, onSearch, mapCenter, mapRef, markerRefs, centerAndPopup };
+    return {
+      dataStore,
+      search,
+      mapCenter,
+      onMapReady,
+      onMarkerReady,
+      onSearch,
+      centerAndPopup,
+      handleCategoryClick
+    };
   }
 };
 </script>
