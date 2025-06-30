@@ -1,18 +1,20 @@
-import { fileURLToPath, URL } from 'node:url'
+// vite.config.js
+import { defineConfig } from 'vite';
+import vue            from '@vitejs/plugin-vue';
+import path           from 'path';
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
-
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
+  plugins: [ vue() ],
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    },
+    alias: [
+      // @ → src
+      { find: '@', replacement: path.resolve(__dirname, 'src') },
+
+      // 只把裸的 'leaflet' 定向到 shim
+      { find: /^leaflet$/, replacement: path.resolve(__dirname, 'src/shims/leaflet.js') }
+    ]
   },
-})
+  optimizeDeps: {
+    include: ['leaflet']
+  }
+});

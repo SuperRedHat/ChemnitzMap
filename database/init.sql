@@ -8,16 +8,16 @@ USE chemnitzmap;
 -- 2. 创建分类表
 CREATE TABLE Category (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(100) NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL UNIQUE,
   color VARCHAR(7) NOT NULL  -- 地图标记颜色 HEX
 );
 
 -- 3. 插入基础分类
 INSERT INTO Category (name, color) VALUES
-  ('剧院', '#FF5733'),
-  ('博物馆', '#33A1FF'),
-  ('公共艺术', '#33FF57'),
-  ('餐厅', '#FF33A1');
+  ('Theatre',   '#FF5733'),
+  ('Museum',    '#33A1FF'),
+  ('Public Art','#33FF57'),
+  ('Restaurant','#FF33A1');
 
 -- 4. 创建地标表
 CREATE TABLE Site (
