@@ -1,10 +1,15 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
+const app = express();
+
 const mysql   = require('mysql2/promise');
 
+app.use(cors()); 
+app.use(express.json());
+
 async function createApp() {
-  const app = express();
-  app.use(express.json());
+ 
 
   // 建立数据库连接池
   const db = await mysql.createPool({
