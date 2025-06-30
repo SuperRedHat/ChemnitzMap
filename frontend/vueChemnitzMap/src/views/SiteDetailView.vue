@@ -137,12 +137,11 @@ const fetchSiteDetail = async () => {
     const response = await http.get(`/sites/${route.params.id}`);
     site.value = response.data;
     
-    // 初始化地图
-    if (detailMap) {
-      detailMap.setView([site.value.lat, site.value.lon], 16);
-    } else {
+    // 等待DOM更新后初始化地图
+    await nextTick();
+    setTimeout(() => {
       initMap();
-    }
+    }, 100);
   } catch (error) {
     console.error('获取地点详情失败:', error);
   } finally {
@@ -153,18 +152,34 @@ const fetchSiteDetail = async () => {
 // 初始化地图
 const initMap = () => {
   if (!site.value) return;
-
-  detailMap = L.map('detail-map').setView([site.value.lat, site.value.lon], 16);
   
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(detailMap);
+  // 确保容器存在
+  const mapContainer = document.getElementById('detail-map');
+  if (!mapContainer) {
+    console.error('Map container not found');
+    return;
+  }
 
-  // 添加标记
-  L.marker([site.value.lat, site.value.lon])
-    .addTo(detailMap)
-    .bindPopup(site.value.name)
-    .openPopup();
+  // 如果地图已存在，先移除
+  if (detailMap) {
+    detailMap.remove();
+  }
+
+  try {
+    detailMap = L.map('detail-map').setView([site.value.lat, site.value.lon], 16);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(detailMap);
+
+    // 添加标记
+    L.marker([site.value.lat, site.value.lon])
+      .addTo(detailMap)
+      .bindPopup(site.value.name)
+      .openPopup();
+  } catch (error) {
+    console.error('Error initializing map:', error);
+  }
 };
 
 // 处理收藏

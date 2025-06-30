@@ -132,24 +132,38 @@ export default {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
 
-      // 添加定位控件
+      // 添加定位按钮（使用HTML元素）
       if ('geolocation' in navigator) {
-        L.control.custom({
-          position: 'topright',
-          content: '<button class="leaflet-bar leaflet-control-custom" title="获取当前位置">📍</button>',
-          classes: '',
-          style: {
-            margin: '10px',
-            cursor: 'pointer'
-          },
-          events: {
-            click: () => {
-              getCurrentLocation();
-            }
-          }
-        }).addTo(map);
+        const locationButton = L.control({ position: 'topright' });
+        
+        locationButton.onAdd = function(map) {
+          const button = L.DomUtil.create('button', 'leaflet-bar leaflet-control-custom');
+          button.innerHTML = '📍';
+          button.title = '获取当前位置';
+          button.style.width = '34px';
+          button.style.height = '34px';
+          button.style.fontSize = '20px';
+          button.style.lineHeight = '30px';
+          button.style.textAlign = 'center';
+          button.style.cursor = 'pointer';
+          button.style.backgroundColor = 'white';
+          button.style.border = '2px solid rgba(0,0,0,0.2)';
+          button.style.borderRadius = '4px';
+          
+          L.DomEvent.on(button, 'click', function(e) {
+            L.DomEvent.stopPropagation(e);
+            L.DomEvent.preventDefault(e);
+            getCurrentLocation();
+          });
+          
+          return button;
+        };
+        
+        locationButton.addTo(map);
       }
     };
+
+
 
     // 更新地图标记
     const updateMarkers = () => {
