@@ -46,10 +46,9 @@
         <li 
           v-for="site in dataStore.sites" 
           :key="site.id"
-          @click="() => centerAndPopup(site.id)"
           class="site-item"
         >
-          <div class="site-info">
+          <div class="site-info" @click="() => centerAndPopup(site.id)">
             <h4 class="site-name" :style="{ color: site.color }">
               {{ site.name }}
             </h4>
@@ -61,9 +60,29 @@
             </div>
           </div>
           <div class="site-actions">
-            <button class="locate-btn" title="在地图上定位">
-              📍
-            </button>
+            <el-button
+              v-if="authStore.isAuthenticated"
+              :icon="favoritesStore.isFavorited(site.id) ? 'Star' : 'StarFilled'"
+              :type="favoritesStore.isFavorited(site.id) ? 'warning' : 'default'"
+              circle
+              size="small"
+              @click="() => handleFavorite(site.id)"
+              :title="favoritesStore.isFavorited(site.id) ? '取消收藏' : '收藏'"
+            />
+            <el-button
+              icon="Location"
+              circle
+              size="small"
+              @click="() => centerAndPopup(site.id)"
+              title="在地图上定位"
+            />
+            <el-button
+              icon="View"
+              circle
+              size="small"
+              @click="() => viewDetails(site.id)"
+              title="查看详情"
+            />
           </div>
         </li>
       </ul>
@@ -74,6 +93,9 @@
 <script>
 import { ref, onMounted, nextTick, watch } from 'vue';
 import { useDataStore }  from '@/stores/dataStore';
+import { useAuthStore } from '@/stores/authStore';
+import { useFavoritesStore } from '@/stores/favoritesStore';
+import { useRouter } from 'vue-router';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -89,7 +111,10 @@ export default {
   name: 'HomeView',
   setup() {
     const dataStore = useDataStore();
-    const search    = ref('');
+    const authStore = useAuthStore();
+    const favoritesStore = useFavoritesStore();
+    const router = useRouter();
+    const search = ref('');
     let map = null;
     const markers = {};  // site.id -> L.Marker
 
@@ -114,6 +139,7 @@ export default {
         const marker = L.marker([site.lat, site.lon]).addTo(map);
         
         // 创建弹窗内容
+        const isFavorited = favoritesStore.isFavorited(site.id);
         const popupContent = `
           <div style="min-width: 250px; max-width: 300px;">
             <h4 style="margin: 0 0 8px 0; color: ${site.color}">
@@ -150,6 +176,21 @@ export default {
                   <span style="font-size: 0.9em;">美食餐厅</span>
                 </div>
               ` : ''}
+            </div>
+            
+            <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: center;">
+              ${authStore.isAuthenticated ? `
+                <button onclick="window.handleMapFavorite(${site.id})" 
+                  style="padding: 6px 12px; background: ${isFavorited ? '#ffc107' : '#f0f0f0'}; 
+                  border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                  ${isFavorited ? '★ 已收藏' : '☆ 收藏'}
+                </button>
+              ` : ''}
+              <button onclick="window.handleMapViewDetails(${site.id})" 
+                style="padding: 6px 12px; background: #409eff; color: white; 
+                border: none; border-radius: 4px; cursor: pointer;">
+                查看详情
+              </button>
             </div>
             
             <p style="margin: 8px 0 4px 0; font-size: 0.8em; color: #999;">
@@ -197,12 +238,39 @@ export default {
       }, 300);
     };
 
+    // 处理收藏
+    const handleFavorite = async (siteId) => {
+      const result = await favoritesStore.toggleFavorite(siteId);
+      if (result.needLogin) {
+        router.push('/login');
+      } else if (result.success) {
+        // 更新地图标记
+        updateMarkers();
+      }
+    };
+
+    // 查看详情
+    const viewDetails = (siteId) => {
+      router.push(`/site/${siteId}`);
+    };
+
+    // 全局函数，供地图弹窗内的按钮调用
+    window.handleMapFavorite = handleFavorite;
+    window.handleMapViewDetails = viewDetails;
+
     // 监听数据变化，更新标记
     watch(() => dataStore.sites, () => {
       if (map) {
         updateMarkers();
       }
     });
+
+    // 监听收藏状态变化
+    watch(() => favoritesStore.favoriteSiteIds, () => {
+      if (map) {
+        updateMarkers();
+      }
+    }, { deep: true });
 
     onMounted(async () => {
       // 初始化地图
@@ -218,10 +286,14 @@ export default {
 
     return {
       dataStore,
+      authStore,
+      favoritesStore,
       search,
       onSearch,
       centerAndPopup,
-      handleCategoryClick
+      handleCategoryClick,
+      handleFavorite,
+      viewDetails
     };
   }
 };
@@ -324,7 +396,6 @@ export default {
   align-items: center;
   padding: 1rem;
   border-bottom: 1px solid #eee;
-  cursor: pointer;
   transition: background 0.2s;
 }
 
@@ -334,6 +405,7 @@ export default {
 
 .site-info {
   flex: 1;
+  cursor: pointer;
 }
 
 .site-name {
@@ -362,20 +434,7 @@ export default {
 
 .site-actions {
   margin-left: 1rem;
-}
-
-.locate-btn {
-  padding: 0.5rem;
-  background: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: all 0.2s;
-}
-
-.locate-btn:hover {
-  background: #e0e0e0;
-  transform: scale(1.1);
+  display: flex;
+  gap: 0.5rem;
 }
 </style>
