@@ -1,9 +1,11 @@
 // frontend/src/api.js
 import axios from 'axios';
+import config from './config';
 
 // 默认 baseURL 指向后端
+// 使用配置中的基础URL
 export const http = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: config.API_BASE_URL,
   timeout: 5000
 });
 

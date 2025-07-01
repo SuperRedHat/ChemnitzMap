@@ -42,6 +42,8 @@ CREATE TABLE User (
   password_hash VARCHAR(100) NOT NULL,
   role ENUM('user','admin') NOT NULL DEFAULT 'user',
   deleted TINYINT(1) NOT NULL DEFAULT 0,
+  current_lat DOUBLE DEFAULT NULL,
+  current_lon DOUBLE DEFAULT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
