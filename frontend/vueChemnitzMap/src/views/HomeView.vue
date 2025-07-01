@@ -1,39 +1,39 @@
 <template>
   <div class="home-container">
-    <!-- 过滤区 -->
+    
     <aside class="filter-panel">
       <h3>Categories</h3>
       <ul>
-        <li 
-          v-for="cat in dataStore.categories" 
+        <li
+          v-for="cat in dataStore.categories"
           :key="cat.id"
           :style="{
             color: cat.color,
             fontWeight: dataStore.filter.category === cat.name ? 'bold' : 'normal'
           }"
-          @click="() => handleCategoryClick(cat.name)"
+          @click="handleCategoryClick(cat.name)"  
         >
           {{ cat.name }}
         </li>
-        <li 
-          @click="() => handleCategoryClick('')"
+        <li
+          @click="handleCategoryClick('')"      
           :style="{ fontStyle: dataStore.filter.category === '' ? 'italic' : 'normal' }"
         >
           All
         </li>
       </ul>
-      <input 
-        type="text" 
-        v-model="search" 
-        placeholder="Search..." 
+      <input
+        type="text"
+        v-model="search"
+        placeholder="Search..."
         @keyup.enter="onSearch"
       />
       <button @click="onSearch">Search</button>
     </aside>
 
-    <!-- 地图 + 列表 -->
+    
     <section class="content-panel">
-      <div id="map-container" style="height: 400px; width: 100%;"></div>
+      <div id="map-container" style="height: 600px; width: 100%;"></div>
 
       <div v-if="dataStore.loading">Loading...</div>
       <div v-if="dataStore.error" style="color: red;">{{ dataStore.error }}</div>
@@ -110,6 +110,15 @@ L.Icon.Default.mergeOptions({
 export default {
   name: 'HomeView',
   setup() {
+    const redIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+      iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
     const dataStore = useDataStore();
     const authStore = useAuthStore();
     const favoritesStore = useFavoritesStore();
@@ -123,6 +132,43 @@ export default {
     const userLocationMarker = ref(null);
     const showNearby = ref(false);
     const nearbyRadius = ref(1000); // 默认1公里
+    
+    
+    // 获取浏览器定位并移动地图
+    const getCurrentLocation = () => {
+      if (!navigator.geolocation) {
+        alert('浏览器不支持定位功能');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          const { latitude, longitude } = coords;
+
+          // 如果之前已有定位标记，先移除它
+          if (userLocationMarker.value) {
+            map.removeLayer(userLocationMarker.value);
+          }
+
+          // 新建一个带红色图标的 Marker
+          const marker = L.marker([latitude, longitude], { icon: redIcon })
+            .addTo(map)
+            .bindPopup('您在这里')
+            .openPopup();
+
+          // 保存到 ref，以便下次定位时移除
+          userLocationMarker.value = marker;
+          userLocation.value = [latitude, longitude];
+
+          // 将地图中心移动到当前位置
+          map.setView([latitude, longitude], 14, { animate: true });
+        },
+        (err) => {
+          console.error('获取定位失败', err);
+          alert('获取当前位置失败');
+        },
+        { enableHighAccuracy: true }
+      );
+    };
 
     // 初始化地图
     const initMap = () => {
@@ -186,12 +232,12 @@ export default {
             <p style="margin: 4px 0;"><strong>类别:</strong> ${site.category}</p>
             ${site.address ? `<p style="margin: 4px 0;"><strong>地址:</strong> ${site.address}</p>` : ''}
             
-            <!-- 显示描述信息 -->
+            
             <p style="margin: 8px 0; font-size: 0.9em; line-height: 1.4;">
               ${site.description || ''}
             </p>
             
-            <!-- 根据不同类别显示不同图标和额外信息 -->
+            
             <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
               ${site.category === 'Theatre' ? `
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -245,13 +291,18 @@ export default {
 
     // 点击分类
     const handleCategoryClick = (category) => {
-      dataStore.setCategory(category);
-    };
+      // 1. 清空搜索框和 store 中的 q
+      search.value = ''
+      dataStore.setQuery('')    // 内部会清空 filter.q 并重新 applyFilter()
+
+      // 2. 设置新的分类
+      dataStore.setCategory(category)  // 内部会 applyFilter()
+    }
 
     // 搜索执行
     const onSearch = () => {
-      dataStore.setQuery(search.value);
-    };
+      dataStore.setQuery(search.value) // 内部会走 applyFilter
+    }
 
     // 定位并打开对应 id 的弹窗
     const centerAndPopup = (siteId) => {
@@ -310,17 +361,13 @@ export default {
       }
     }, { deep: true });
 
+    // 初始加载
     onMounted(async () => {
-      // 初始化地图
-      initMap();
-      
-      // 加载数据
-      await dataStore.loadCategories();
-      await dataStore.loadSites();
-      
-      // 更新标记
-      updateMarkers();
-    });
+      initMap()
+      await dataStore.loadCategories()  // 拉分类
+      await dataStore.loadAllSites()       // 拉站点
+      updateMarkers()
+    })
 
     return {
       dataStore,
@@ -331,7 +378,8 @@ export default {
       centerAndPopup,
       handleCategoryClick,
       handleFavorite,
-      viewDetails
+      viewDetails,
+      getCurrentLocation
     };
   }
 };
