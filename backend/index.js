@@ -2,12 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
-
+const { seedAdmin } = require('./scripts/seedAdmin.js'); // 相对路径到你的脚本
 const mysql   = require('mysql2/promise');
 
 app.use(cors()); 
 app.use(express.json());
-
 
 
 async function createApp() {
@@ -23,6 +22,9 @@ async function createApp() {
     waitForConnections: true,
     connectionLimit:    10,
   });
+
+  // 先执行种子脚本
+  await seedAdmin();
 
   // 健康检查
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
