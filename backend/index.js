@@ -1,17 +1,16 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 const app = express();
-const { seedAdmin } = require('./scripts/seedAdmin.js'); // 相对路径到你的脚本
-const mysql   = require('mysql2/promise');
+const { seedAdmin } = require('./scripts/seedAdmin.js');
+const mysql = require('mysql2/promise');
 
 app.use(cors()); 
 app.use(express.json());
 
-
 async function createApp() {
- 
-
   // 建立数据库连接池
   const db = await mysql.createPool({
     host:     process.env.DB_HOST,
@@ -26,9 +25,11 @@ async function createApp() {
   // 先执行种子脚本
   await seedAdmin();
 
+  // Swagger UI 路由 - 放在 API 路由之前
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
   // 健康检查
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
-
 
   // 装载路由，并把 db 传进去
   app.use('/api/categories', require('./routes/categories')(db));
@@ -41,7 +42,10 @@ async function createApp() {
 
 createApp().then(app => {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`🚀 Server listening on http://localhost:${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`🚀 Server listening on http://localhost:${PORT}`);
+    console.log(`📚 API文档地址: http://localhost:${PORT}/api-docs`);
+  });
 }).catch(err => {
   console.error('❌ Failed to start server:', err);
   process.exit(1);

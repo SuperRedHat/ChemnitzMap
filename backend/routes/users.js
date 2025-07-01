@@ -1,3 +1,78 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - username
+ *         - email
+ *         - password
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: 用户ID
+ *         username:
+ *           type: string
+ *           description: 用户名
+ *         email:
+ *           type: string
+ *           description: 邮箱
+ *         role:
+ *           type: string
+ *           enum: [user, admin]
+ *           description: 用户角色
+ *         current_lat:
+ *           type: number
+ *           description: 当前纬度
+ *         current_lon:
+ *           type: number
+ *           description: 当前经度
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *           description: 创建时间
+ */
+
+/**
+ * @swagger
+ * /users/register:
+ *   post:
+ *     summary: 用户注册
+ *     tags: [用户管理]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - email
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: 注册成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 token:
+ *                   type: string
+ */
+
 // backend/routes/users.js
 const express = require('express');
 const bcrypt = require('bcrypt');
@@ -121,10 +196,10 @@ module.exports = (db) => {
   // 获取当前用户信息
   router.get('/me', authenticateToken, async (req, res) => {
     try {
-      const [users] = await db.query(
-        'SELECT id, username, email, role, created_at FROM User WHERE id = ? AND deleted = 0',
-        [req.user.id]
-      );
+    const [users] = await db.query(
+      'SELECT id, username, email, role, current_lat, current_lon, created_at FROM User WHERE id = ? AND deleted = 0',  
+      [req.user.id]
+    );
 
       if (users.length === 0) {
         return res.status(404).json({ error: '用户不存在' });
@@ -146,6 +221,12 @@ module.exports = (db) => {
       // 构建更新字段
       const updates = [];
       const params = [];
+
+      // 更新位置信息
+      if (req.body.current_lat !== undefined && req.body.current_lon !== undefined) {
+        updates.push('current_lat = ?, current_lon = ?');  // 注意这里是一个字符串，不是两个
+        params.push(req.body.current_lat, req.body.current_lon);
+      }
 
       if (username) {
         // 检查用户名是否已被其他用户使用
@@ -218,7 +299,7 @@ module.exports = (db) => {
 
       // 返回更新后的用户信息
       const [updatedUser] = await db.query(
-        'SELECT id, username, email, role, created_at FROM User WHERE id = ?',
+        'SELECT id, username, email, role, current_lat, current_lon, created_at FROM User WHERE id = ?',  // 添加位置字段
         [userId]
       );
 
@@ -236,7 +317,7 @@ module.exports = (db) => {
   router.get('/', authenticateToken, requireAdmin, async (req, res) => {
     try {
       const [users] = await db.query(
-        'SELECT id, username, email, role, deleted, created_at FROM User ORDER BY created_at DESC'
+        'SELECT id, username, email, role, deleted, current_lat, current_lon, created_at FROM User ORDER BY created_at DESC'
       );
       res.json(users);
     } catch (err) {
@@ -244,6 +325,19 @@ module.exports = (db) => {
       res.status(500).json({ error: '获取用户列表失败' });
     }
   });
+
+  router.get('/deleted/list', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const [deletedUsers] = await db.query(
+        'SELECT id, username, email, role, created_at FROM User WHERE deleted = 1 ORDER BY created_at DESC'
+      );
+      res.json(deletedUsers);
+    } catch (err) {
+      console.error('获取已删除用户列表错误:', err);
+      res.status(500).json({ error: '获取已删除用户列表失败' });
+    }
+  });
+
 
   // 删除用户（软删除，仅管理员）
   router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {

@@ -29,6 +29,14 @@
           <span>{{ formatDate(authStore.user?.created_at) }}</span>
         </el-form-item>
 
+        <el-form-item label="当前位置">
+          <span v-if="authStore.user?.current_lat && authStore.user?.current_lon">
+            📍 纬度: {{ authStore.user.current_lat.toFixed(6) }}, 
+            经度: {{ authStore.user.current_lon.toFixed(6) }}
+          </span>
+          <span v-else>未设置位置</span>
+        </el-form-item>
+
         <el-divider>修改密码</el-divider>
 
         <el-form-item label="当前密码" prop="currentPassword">

@@ -44,6 +44,16 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="位置" width="100">
+          <template #default="scope">
+            <span v-if="scope.row.current_lat && scope.row.current_lon" title="已设置位置">
+              📍 已定位
+            </span>
+            <span v-else style="color: #909399;">
+              未定位
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="created_at" label="注册时间" width="180">
           <template #default="scope">
             {{ formatDate(scope.row.created_at) }}

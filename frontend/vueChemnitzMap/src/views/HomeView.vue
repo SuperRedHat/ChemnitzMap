@@ -91,6 +91,7 @@
 </template>
 
 <script>
+import { http } from '@/api'; 
 import { ref, onMounted, nextTick, watch } from 'vue';
 import { useDataStore }  from '@/stores/dataStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -133,7 +134,6 @@ export default {
     const showNearby = ref(false);
     const nearbyRadius = ref(1000); // 默认1公里
     
-    
     // 获取浏览器定位并移动地图
     const getCurrentLocation = () => {
       if (!navigator.geolocation) {
@@ -141,7 +141,7 @@ export default {
         return;
       }
       navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
+        async ({ coords }) => {  // 注意这里添加了 async
           const { latitude, longitude } = coords;
 
           // 如果之前已有定位标记，先移除它
@@ -161,6 +161,20 @@ export default {
 
           // 将地图中心移动到当前位置
           map.setView([latitude, longitude], 14, { animate: true });
+
+          // 保存位置到用户资料
+          if (authStore.isAuthenticated) {
+            try {
+              await http.put('/users/me', {
+                current_lat: latitude,
+                current_lon: longitude
+              });
+              console.log('位置已保存到用户资料');
+              await authStore.fetchCurrentUser();
+            } catch (error) {
+              console.error('保存位置失败:', error);
+            }
+          }
         },
         (err) => {
           console.error('获取定位失败', err);
