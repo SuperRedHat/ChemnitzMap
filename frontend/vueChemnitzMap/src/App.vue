@@ -5,7 +5,26 @@ import { useAuthStore } from '@/stores/authStore';
 import { useFavoritesStore } from '@/stores/favoritesStore';
 import { useFootprintsStore } from '@/stores/footprintsStore';
 import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { setLanguage } from '@/locales';
 
+const { locale } = useI18n();
+
+// 计算当前语言名称
+const currentLanguageName = computed(() => {
+  const langMap = {
+    'en': 'English',
+    'de': 'Deutsch',
+    'zh': '中文'
+  };
+  return langMap[locale.value] || 'English';
+});
+
+// 处理语言切换
+const handleLanguageChange = (lang) => {
+  setLanguage(lang);
+};
 const authStore = useAuthStore();
 const favoritesStore = useFavoritesStore();
 const footprintsStore = useFootprintsStore();
@@ -54,6 +73,28 @@ const handleCommand = (command) => {
         <router-link to="/">地图</router-link>
         <router-link to="/about">关于</router-link>
         
+        <!-- 添加语言切换器 -->
+        <el-dropdown @command="handleLanguageChange" class="language-switcher">
+          <span class="el-dropdown-link">
+            <el-icon><Translate /></el-icon>
+            {{ currentLanguageName }}
+            <el-icon class="el-icon--right"><arrow-down /></el-icon>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="en">
+                <span class="lang-option">🇬🇧 English</span>
+              </el-dropdown-item>
+              <el-dropdown-item command="de">
+                <span class="lang-option">🇩🇪 Deutsch</span>
+              </el-dropdown-item>
+              <el-dropdown-item command="zh">
+                <span class="lang-option">🇨🇳 简体中文</span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
         <!-- 用户菜单 -->
         <div class="user-menu">
           <template v-if="authStore.isAuthenticated">
@@ -104,6 +145,35 @@ const handleCommand = (command) => {
 </template>
 
 <style scoped>
+/* 语言切换过渡效果 */
+.language-transition {
+  transition: all 0.3s ease;
+}
+
+/* 修复下拉菜单样式 */
+.el-dropdown-menu__item {
+  display: flex;
+  align-items: center;
+}
+
+.language-switcher {
+  margin: 0 1rem;
+}
+
+.el-dropdown-link {
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 #app {
   height: 100vh;
   display: flex;

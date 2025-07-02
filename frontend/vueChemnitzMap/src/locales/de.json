@@ -164,58 +164,28 @@
     "tenMinuteModeOn": "10-Minuten-Stadt-Modus aktiviert, erreichbare Entfernung {distance} km"
   },
   "about": {
-    "title": "Über Chemnitz Kulturkarte",
-    "intro": {
-      "title": "Projektvorstellung",
-      "content": "Die Chemnitz Kulturkarte ist eine interaktive Webanwendung, die Touristen und Einheimischen hilft, das reiche kulturelle Erbe von Chemnitz zu erkunden. Über eine intuitive Kartenoberfläche können Nutzer Theater, Museen, öffentliche Kunst und Restaurants in der ganzen Stadt entdecken."
+    "subtitle": "Stadtkultur erkunden, wunderbares Leben entdecken",
+    "stats": {
+      "sites": "Kulturorte",
+      "categories": "Kategorien",
+      "users": "Registrierte Nutzer"
     },
-    "features": {
-      "title": "Funktionsübersicht",
-      "mapBrowsing": {
-        "title": "Kartendarstellung",
-        "desc": "Interaktive Karte mit allen Kulturorten, farbcodiert nach Kategorien"
-      },
-      "searchFilter": {
-        "title": "Suche & Filter",
-        "desc": "Nach Kategorie filtern oder mit Stichwörtern nach bestimmten Orten suchen"
-      },
-      "userFeatures": {
-        "title": "Benutzerfunktionen",
-        "desc": "Registrieren Sie sich, um Favoriten zu speichern und besuchte Orte zu verfolgen"
-      },
-      "specialModes": {
-        "title": "Spezialmodi",
-        "nearbyMode": "Nähe-Modus: Orte in Fußweite entdecken",
-        "tenMinuteCity": "10-Minuten-Stadt: Mit ÖPNV erreichbare Orte finden"
-      }
-    },
-    "howTo": {
-      "title": "Anleitung",
-      "step1": "Durchsuchen Sie die Karte oder nutzen Sie Filter, um interessante Orte zu finden",
-      "step2": "Klicken Sie auf Markierungen für detaillierte Informationen",
-      "step3": "Registrieren Sie ein Konto für personalisierte Funktionen",
-      "step4": "Sammeln Sie Orte durch persönlichen Besuch (innerhalb von 400m)",
-      "step5": "Verfolgen Sie Ihren Fortschritt und verdienen Sie Erfolge"
-    },
-    "data": {
-      "title": "Datenquelle",
-      "content": "Alle Standortdaten stammen von OpenStreetMap, einem kollaborativen Projekt zur Erstellung einer frei bearbeitbaren Weltkarte. Die Daten werden regelmäßig aktualisiert, um Genauigkeit zu gewährleisten."
-    },
-    "tech": {
-      "title": "Technologie-Stack",
-      "frontend": "Frontend: Vue 3, Leaflet, Element Plus",
-      "backend": "Backend: Node.js, Express, MySQL",
-      "api": "API: RESTful-Architektur mit JWT-Authentifizierung"
-    },
-    "contact": {
-      "title": "Kontakt",
-      "content": "Dieses Projekt wurde im Rahmen des Kurses Datenbanken und Web-Technologien an der TU Chemnitz entwickelt."
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "q1": "Wie sammle ich Orte?",
+      "a1": "Wenn Sie sich innerhalb von 400 Metern von einem Ort befinden, klicken Sie auf 'Sammeln', um ihn zu Ihren Spuren hinzuzufügen.",
+      "q2": "Was ist der 10-Minuten-Stadt-Modus?",
+      "a2": "Dieser Modus zeigt alle Kulturorte, die Sie innerhalb von 10 Minuten mit öffentlichen Verkehrsmitteln erreichen können.",
+      "q3": "Wie erhalte ich Erfolgsabzeichen?",
+      "a3": "Sammeln Sie verschiedene Kategorien von Orten, um Erfolge zu erzielen. Alle 5 Orte derselben Kategorie bringen Ihnen das Kategorieabzeichen.",
+      "q4": "Sind meine Daten sicher?",
+      "a4": "Wir verwenden branchenübliche Verschlüsselung zum Schutz Ihrer Daten. Passwörter werden verschlüsselt gespeichert und Standortdaten nur bei aktiver Freigabe erfasst.",
+      "q5": "Wie kann ich Daten beitragen?",
+      "a5": "Die Ortsdaten stammen von OpenStreetMap. Sie können neue Orte beitragen, indem Sie OpenStreetMap bearbeiten."
     }
   },
-  "categories": {
-    "Theatre": "Theater",
-    "Museum": "Museum",
-    "Public Art": "Öffentliche Kunst",
-    "Restaurant": "Restaurant"
+  "common": {
+    "step": "Schritt",
+    "documentation": "Dokumentation"
   }
 }
