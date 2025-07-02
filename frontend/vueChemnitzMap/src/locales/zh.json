@@ -1,0 +1,221 @@
+{
+  "app": {
+    "title": "开姆尼茨文化地图",
+    "nav": {
+      "map": "地图",
+      "about": "关于",
+      "login": "登录",
+      "register": "注册",
+      "profile": "个人资料",
+      "favorites": "我的收藏",
+      "footprints": "我的足迹",
+      "admin": "管理后台",
+      "logout": "退出登录"
+    }
+  },
+  "map": {
+    "categories": "分类",
+    "all": "全部",
+    "nearby": "附近",
+    "tenMinute": "10分钟可达",
+    "search": "搜索...",
+    "searchButton": "搜索",
+    "results": "文化地点列表（{count} 个结果）",
+    "loading": "加载中...",
+    "error": "加载数据失败",
+    "scanRadius": "扫描半径：{radius} 米",
+    "travelTime": "出行时间：{time} 分钟",
+    "walkingTime": "步行时间：{time}分钟",
+    "transitTime": "公交时间：{time}分钟",
+    "reachableRange": "可达范围：{distance}公里",
+    "currentCategory": "当前分类"
+  },
+  "site": {
+    "category": "类别",
+    "address": "地址",
+    "coordinates": "坐标",
+    "description": "描述",
+    "noDescription": "暂无描述信息",
+    "distance": "距离",
+    "collect": "收集",
+    "collected": "已收集",
+    "tooFar": "太远了",
+    "favorite": "收藏",
+    "favorited": "已收藏",
+    "viewDetails": "查看详情",
+    "back": "返回"
+  },
+  "auth": {
+    "username": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "login": "登录",
+    "register": "注册",
+    "loginTitle": "登录 Chemnitz Cultural Map",
+    "registerTitle": "创建新账号",
+    "noAccount": "还没有账号？",
+    "hasAccount": "已有账号？",
+    "role": "角色",
+    "admin": "管理员",
+    "user": "普通用户",
+    "registeredAt": "注册时间",
+    "currentLocation": "当前位置",
+    "notSet": "未设置位置",
+    "latitude": "纬度",
+    "longitude": "经度"
+  },
+  "validation": {
+    "required": "请填写此字段",
+    "email": "请输入有效的邮箱地址",
+    "minLength": "至少需要 {min} 个字符",
+    "passwordMatch": "两次输入密码不一致",
+    "loginFailed": "用户名或密码错误",
+    "registerFailed": "注册失败",
+    "updateFailed": "更新失败"
+  },
+  "profile": {
+    "title": "个人资料",
+    "updatePassword": "修改密码",
+    "saveChanges": "保存修改",
+    "reset": "重置"
+  },
+  "favorites": {
+    "title": "我的收藏",
+    "count": "共 {count} 个收藏",
+    "empty": "暂无收藏",
+    "addedAt": "收藏于",
+    "viewOnMap": "在地图查看",
+    "remove": "取消收藏"
+  },
+  "footprints": {
+    "title": "我的足迹",
+    "subtitle": "记录你的城市探索之旅",
+    "progress": "总进度：已收集 {current}/{total} ({percentage}%)",
+    "medals": "{count}枚勋章",
+    "nextMilestone": "下一个里程碑：{current}/5",
+    "achievements": "成就墙",
+    "museumLover": "博物馆爱好者",
+    "theaterFan": "戏剧达人",
+    "artCollector": "艺术收藏家",
+    "foodExplorer": "美食探索者",
+    "firstExplore": "初次探索",
+    "cityWanderer": "城市漫游者",
+    "culturalAmbassador": "文化大使",
+    "collectedAt": "收集于",
+    "collectionDistance": "收集距离",
+    "cardView": "卡片视图",
+    "mapView": "地图视图",
+    "timeline": "时间线"
+  },
+  "comment": {
+    "title": "用户评价",
+    "rating": "评分",
+    "avgRating": "{rating}",
+    "ratingCount": "（{count} 条评价）",
+    "writeReview": "写评论",
+    "loginToReview": "登录后评论",
+    "alreadyReviewed": "您已评论过该地点",
+    "noReviews": "暂无评价",
+    "viewAll": "查看全部 {count} 条评论",
+    "submitReview": "发布评论",
+    "reviewContent": "评价内容",
+    "shareExperience": "分享您的体验...",
+    "ratingRequired": "请选择评分",
+    "contentRequired": "请输入评论内容",
+    "submitSuccess": "评论发布成功",
+    "deleteConfirm": "确定要删除这条评论吗？",
+    "deleteSuccess": "评论已删除"
+  },
+  "admin": {
+    "userManagement": "用户管理",
+    "commentManagement": "评论管理",
+    "totalUsers": "总用户数",
+    "activeUsers": "活跃用户",
+    "adminCount": "管理员数",
+    "deletedUsers": "已删除用户",
+    "status": "状态",
+    "normal": "正常",
+    "deleted": "已删除",
+    "located": "已定位",
+    "notLocated": "未定位",
+    "operations": "操作",
+    "delete": "删除",
+    "self": "本人",
+    "deleteConfirm": "确定要删除用户 \"{username}\" 吗？此操作为软删除，用户将无法登录。",
+    "batchDelete": "批量删除 ({count})",
+    "clearSelection": "清除选择"
+  },
+  "messages": {
+    "welcome": "欢迎使用开姆尼茨文化地图",
+    "loginSuccess": "登录成功",
+    "logoutSuccess": "已退出登录",
+    "registerSuccess": "注册成功",
+    "updateSuccess": "更新成功",
+    "deleteSuccess": "删除成功",
+    "collectSuccess": "成功收集 \"{name}\"！",
+    "favoriteSuccess": "收藏成功",
+    "unfavoriteSuccess": "已取消收藏",
+    "locationRequired": "请先获取当前位置",
+    "locationFailed": "获取当前位置失败，请检查定位权限",
+    "nearbyModeOn": "已开启附近模式，扫描半径 {radius} 米",
+    "tenMinuteModeOn": "已开启10分钟城市模式，可达范围 {distance} 公里"
+  },
+  "about": {
+    "title": "关于开姆尼茨文化地图",
+    "intro": {
+      "title": "项目介绍",
+      "content": "开姆尼茨文化地图是一个互动式网络应用，旨在帮助游客和当地居民探索开姆尼茨丰富的文化遗产。通过直观的地图界面，用户可以发现整个城市的剧院、博物馆、公共艺术和餐厅。"
+    },
+    "features": {
+      "title": "功能指南",
+      "mapBrowsing": {
+        "title": "地图浏览",
+        "desc": "交互式地图显示所有文化地点，按类别进行颜色编码"
+      },
+      "searchFilter": {
+        "title": "搜索和筛选",
+        "desc": "按类别筛选或使用关键词搜索特定地点"
+      },
+      "userFeatures": {
+        "title": "用户功能",
+        "desc": "注册账号以保存收藏和追踪访问过的地点"
+      },
+      "specialModes": {
+        "title": "特殊模式",
+        "nearbyMode": "附近模式：发现步行可达的地点",
+        "tenMinuteCity": "10分钟城市：查找公共交通可达的地点"
+      }
+    },
+    "howTo": {
+      "title": "使用教程",
+      "step1": "浏览地图或使用筛选器查找感兴趣的地点",
+      "step2": "点击标记查看详细信息",
+      "step3": "注册账号以解锁个性化功能",
+      "step4": "通过亲自访问收集地点（400米内）",
+      "step5": "追踪您的进度并获得成就"
+    },
+    "data": {
+      "title": "数据来源",
+      "content": "所有位置数据均来自 OpenStreetMap，这是一个创建免费可编辑世界地图的协作项目。数据定期更新以确保准确性。"
+    },
+    "tech": {
+      "title": "技术栈",
+      "frontend": "前端：Vue 3、Leaflet、Element Plus",
+      "backend": "后端：Node.js、Express、MySQL",
+      "api": "API：采用 JWT 认证的 RESTful 架构"
+    },
+    "contact": {
+      "title": "联系方式",
+      "content": "本项目是开姆尼茨工业大学数据库与网络技术课程的一部分。"
+    }
+  },
+  "categories": {
+    "Theatre": "剧院",
+    "Museum": "博物馆",
+    "Public Art": "公共艺术",
+    "Restaurant": "餐厅"
+  }
+}

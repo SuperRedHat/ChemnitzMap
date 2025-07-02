@@ -1,0 +1,221 @@
+{
+  "app": {
+    "title": "Chemnitz Kulturkarte",
+    "nav": {
+      "map": "Karte",
+      "about": "Über",
+      "login": "Anmelden",
+      "register": "Registrieren",
+      "profile": "Profil",
+      "favorites": "Meine Favoriten",
+      "footprints": "Meine Spuren",
+      "admin": "Admin-Bereich",
+      "logout": "Abmelden"
+    }
+  },
+  "map": {
+    "categories": "Kategorien",
+    "all": "Alle",
+    "nearby": "In der Nähe",
+    "tenMinute": "10-Min-Stadt",
+    "search": "Suchen...",
+    "searchButton": "Suchen",
+    "results": "Kulturorte ({count} Ergebnisse)",
+    "loading": "Laden...",
+    "error": "Fehler beim Laden der Daten",
+    "scanRadius": "Scanradius: {radius} Meter",
+    "travelTime": "Reisezeit: {time} Minuten",
+    "walkingTime": "Fußweg: {time} Min",
+    "transitTime": "ÖPNV: {time} Min",
+    "reachableRange": "Erreichbar: {distance} km",
+    "currentCategory": "Aktuelle Kategorie"
+  },
+  "site": {
+    "category": "Kategorie",
+    "address": "Adresse",
+    "coordinates": "Koordinaten",
+    "description": "Beschreibung",
+    "noDescription": "Keine Beschreibung verfügbar",
+    "distance": "Entfernung",
+    "collect": "Sammeln",
+    "collected": "Gesammelt",
+    "tooFar": "Zu weit",
+    "favorite": "Favorit",
+    "favorited": "Favorisiert",
+    "viewDetails": "Details anzeigen",
+    "back": "Zurück"
+  },
+  "auth": {
+    "username": "Benutzername",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "currentPassword": "Aktuelles Passwort",
+    "newPassword": "Neues Passwort",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "loginTitle": "Bei Chemnitz Kulturkarte anmelden",
+    "registerTitle": "Neues Konto erstellen",
+    "noAccount": "Noch kein Konto?",
+    "hasAccount": "Bereits ein Konto?",
+    "role": "Rolle",
+    "admin": "Administrator",
+    "user": "Benutzer",
+    "registeredAt": "Registriert am",
+    "currentLocation": "Aktueller Standort",
+    "notSet": "Nicht festgelegt",
+    "latitude": "Breitengrad",
+    "longitude": "Längengrad"
+  },
+  "validation": {
+    "required": "Dieses Feld ist erforderlich",
+    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "minLength": "Mindestens {min} Zeichen erforderlich",
+    "passwordMatch": "Passwörter stimmen nicht überein",
+    "loginFailed": "Ungültiger Benutzername oder Passwort",
+    "registerFailed": "Registrierung fehlgeschlagen",
+    "updateFailed": "Aktualisierung fehlgeschlagen"
+  },
+  "profile": {
+    "title": "Profil",
+    "updatePassword": "Passwort ändern",
+    "saveChanges": "Änderungen speichern",
+    "reset": "Zurücksetzen"
+  },
+  "favorites": {
+    "title": "Meine Favoriten",
+    "count": "Insgesamt {count} Favoriten",
+    "empty": "Noch keine Favoriten",
+    "addedAt": "Favorisiert am",
+    "viewOnMap": "Auf Karte anzeigen",
+    "remove": "Entfernen"
+  },
+  "footprints": {
+    "title": "Meine Spuren",
+    "subtitle": "Dokumentiere deine Stadterkundung",
+    "progress": "Fortschritt: {current}/{total} gesammelt ({percentage}%)",
+    "medals": "{count} Medaillen",
+    "nextMilestone": "Nächster Meilenstein: {current}/5",
+    "achievements": "Erfolgswand",
+    "museumLover": "Museumsliebhaber",
+    "theaterFan": "Theaterfan",
+    "artCollector": "Kunstsammler",
+    "foodExplorer": "Feinschmecker",
+    "firstExplore": "Erste Erkundung",
+    "cityWanderer": "Stadtwanderer",
+    "culturalAmbassador": "Kulturbotschafter",
+    "collectedAt": "Gesammelt am",
+    "collectionDistance": "Sammelentfernung",
+    "cardView": "Kartenansicht",
+    "mapView": "Kartenansicht",
+    "timeline": "Zeitachse"
+  },
+  "comment": {
+    "title": "Benutzerbewertungen",
+    "rating": "Bewertung",
+    "avgRating": "{rating}",
+    "ratingCount": "({count} Bewertungen)",
+    "writeReview": "Bewertung schreiben",
+    "loginToReview": "Zum Bewerten anmelden",
+    "alreadyReviewed": "Sie haben diesen Ort bereits bewertet",
+    "noReviews": "Noch keine Bewertungen",
+    "viewAll": "Alle {count} Bewertungen anzeigen",
+    "submitReview": "Bewertung abgeben",
+    "reviewContent": "Bewertungsinhalt",
+    "shareExperience": "Teilen Sie Ihre Erfahrung...",
+    "ratingRequired": "Bitte wählen Sie eine Bewertung",
+    "contentRequired": "Bitte geben Sie einen Bewertungstext ein",
+    "submitSuccess": "Bewertung erfolgreich abgegeben",
+    "deleteConfirm": "Möchten Sie diese Bewertung wirklich löschen?",
+    "deleteSuccess": "Bewertung erfolgreich gelöscht"
+  },
+  "admin": {
+    "userManagement": "Benutzerverwaltung",
+    "commentManagement": "Kommentarverwaltung",
+    "totalUsers": "Benutzer gesamt",
+    "activeUsers": "Aktive Benutzer",
+    "adminCount": "Administratoren",
+    "deletedUsers": "Gelöschte Benutzer",
+    "status": "Status",
+    "normal": "Normal",
+    "deleted": "Gelöscht",
+    "located": "Lokalisiert",
+    "notLocated": "Nicht lokalisiert",
+    "operations": "Operationen",
+    "delete": "Löschen",
+    "self": "Selbst",
+    "deleteConfirm": "Möchten Sie den Benutzer \"{username}\" wirklich löschen? Dies ist eine Soft-Löschung, der Benutzer kann sich nicht mehr anmelden.",
+    "batchDelete": "Stapellöschung ({count})",
+    "clearSelection": "Auswahl löschen"
+  },
+  "messages": {
+    "welcome": "Willkommen bei der Chemnitz Kulturkarte",
+    "loginSuccess": "Anmeldung erfolgreich",
+    "logoutSuccess": "Abmeldung erfolgreich",
+    "registerSuccess": "Registrierung erfolgreich",
+    "updateSuccess": "Aktualisierung erfolgreich",
+    "deleteSuccess": "Löschen erfolgreich",
+    "collectSuccess": "\"{name}\" erfolgreich gesammelt!",
+    "favoriteSuccess": "Favorisierung erfolgreich",
+    "unfavoriteSuccess": "Favorisierung entfernt",
+    "locationRequired": "Bitte zuerst aktuellen Standort abrufen",
+    "locationFailed": "Standortabruf fehlgeschlagen, bitte Standortberechtigung prüfen",
+    "nearbyModeOn": "Nähe-Modus aktiviert, Scanradius {radius} Meter",
+    "tenMinuteModeOn": "10-Minuten-Stadt-Modus aktiviert, erreichbare Entfernung {distance} km"
+  },
+  "about": {
+    "title": "Über Chemnitz Kulturkarte",
+    "intro": {
+      "title": "Projektvorstellung",
+      "content": "Die Chemnitz Kulturkarte ist eine interaktive Webanwendung, die Touristen und Einheimischen hilft, das reiche kulturelle Erbe von Chemnitz zu erkunden. Über eine intuitive Kartenoberfläche können Nutzer Theater, Museen, öffentliche Kunst und Restaurants in der ganzen Stadt entdecken."
+    },
+    "features": {
+      "title": "Funktionsübersicht",
+      "mapBrowsing": {
+        "title": "Kartendarstellung",
+        "desc": "Interaktive Karte mit allen Kulturorten, farbcodiert nach Kategorien"
+      },
+      "searchFilter": {
+        "title": "Suche & Filter",
+        "desc": "Nach Kategorie filtern oder mit Stichwörtern nach bestimmten Orten suchen"
+      },
+      "userFeatures": {
+        "title": "Benutzerfunktionen",
+        "desc": "Registrieren Sie sich, um Favoriten zu speichern und besuchte Orte zu verfolgen"
+      },
+      "specialModes": {
+        "title": "Spezialmodi",
+        "nearbyMode": "Nähe-Modus: Orte in Fußweite entdecken",
+        "tenMinuteCity": "10-Minuten-Stadt: Mit ÖPNV erreichbare Orte finden"
+      }
+    },
+    "howTo": {
+      "title": "Anleitung",
+      "step1": "Durchsuchen Sie die Karte oder nutzen Sie Filter, um interessante Orte zu finden",
+      "step2": "Klicken Sie auf Markierungen für detaillierte Informationen",
+      "step3": "Registrieren Sie ein Konto für personalisierte Funktionen",
+      "step4": "Sammeln Sie Orte durch persönlichen Besuch (innerhalb von 400m)",
+      "step5": "Verfolgen Sie Ihren Fortschritt und verdienen Sie Erfolge"
+    },
+    "data": {
+      "title": "Datenquelle",
+      "content": "Alle Standortdaten stammen von OpenStreetMap, einem kollaborativen Projekt zur Erstellung einer frei bearbeitbaren Weltkarte. Die Daten werden regelmäßig aktualisiert, um Genauigkeit zu gewährleisten."
+    },
+    "tech": {
+      "title": "Technologie-Stack",
+      "frontend": "Frontend: Vue 3, Leaflet, Element Plus",
+      "backend": "Backend: Node.js, Express, MySQL",
+      "api": "API: RESTful-Architektur mit JWT-Authentifizierung"
+    },
+    "contact": {
+      "title": "Kontakt",
+      "content": "Dieses Projekt wurde im Rahmen des Kurses Datenbanken und Web-Technologien an der TU Chemnitz entwickelt."
+    }
+  },
+  "categories": {
+    "Theatre": "Theater",
+    "Museum": "Museum",
+    "Public Art": "Öffentliche Kunst",
+    "Restaurant": "Restaurant"
+  }
+}
