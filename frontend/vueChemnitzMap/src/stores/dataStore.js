@@ -14,10 +14,50 @@ export const useDataStore = defineStore('data', {
       q: '',            // 搜索关键字
       nearbyMode: false,      // 新增：是否开启附近模式
       nearbyRadius: 1000,     // 新增：附近模式的半径（米）
-      userLocation: null      // 新增：用户位置 [lat, lon]
+      userLocation: null,      // 新增：用户位置 [lat, lon]
+      tenMinuteMode: false,      // 10分钟城市模式
+      maxTravelTime: 10,          // 最大出行时间（分钟）
+      transportSpeed: 20,         // 公交平均速度 km/h
+      walkingSpeed: 5,            // 步行速度 km/h
+      walkingTime: 3              // 预留步行时间（分钟）
     }
   }),
   actions: {
+    /** 设置10分钟城市模式 */
+    setTenMinuteMode(enabled, location = null) {
+      this.filter.tenMinuteMode = enabled;
+      if (location) {
+        this.filter.userLocation = location;
+      }
+      if (enabled) {
+        // 开启10分钟模式时，清空其他过滤条件
+        this.filter.nearbyMode = false;
+        this.filter.category = '';
+        this.filter.q = '';
+      }
+      this.applyFilter();
+    },
+
+    /** 设置最大出行时间 */
+    setMaxTravelTime(minutes) {
+      this.filter.maxTravelTime = minutes;
+      if (this.filter.tenMinuteMode) {
+        this.applyFilter();
+      }
+    },
+
+    /** 计算可达距离（米） */
+    calculateReachableDistance() {
+      // 公交时间 = 总时间 - 步行时间
+      const transitTime = Math.max(0, this.filter.maxTravelTime - this.filter.walkingTime);
+      // 公交距离（公里转米）
+      const transitDistance = (transitTime / 60) * this.filter.transportSpeed * 1000;
+      // 步行距离（公里转米）
+      const walkingDistance = (this.filter.walkingTime / 60) * this.filter.walkingSpeed * 1000;
+      // 总可达距离
+      return transitDistance + walkingDistance;
+    },
+
     /** 拉分类 **/
     async loadCategories() {
       try {
@@ -82,8 +122,21 @@ export const useDataStore = defineStore('data', {
       console.log('💡 applyFilter(), allSites length:', this.allSites.length);
       let result = this.allSites;
 
-      // 如果是附近模式，先按距离过滤
-      if (this.filter.nearbyMode && this.filter.userLocation) {
+      // 如果是10分钟城市模式
+      if (this.filter.tenMinuteMode && this.filter.userLocation) {
+        const [userLat, userLon] = this.filter.userLocation;
+        const maxDistance = this.calculateReachableDistance();
+        
+        result = result.filter(site => {
+          const distance = this.calculateDistance(
+            userLat, userLon, 
+            site.lat, site.lon
+          );
+          return distance <= maxDistance;
+        });
+      }
+      // 如果是附近模式
+      else if (this.filter.nearbyMode && this.filter.userLocation) {
         const [userLat, userLon] = this.filter.userLocation;
         result = result.filter(site => {
           const distance = this.calculateDistance(
@@ -93,23 +146,20 @@ export const useDataStore = defineStore('data', {
           return distance <= this.filter.nearbyRadius;
         });
         
-        // 在附近模式下，如果还选择了分类，继续过滤
         if (this.filter.category) {
           result = result.filter(
             site => site.category === this.filter.category
           );
         }
       } 
-      // 否则按原有逻辑过滤
+      // 普通模式
       else {
-        // 按类别过滤
         if (this.filter.category) {
           result = result.filter(
             site => site.category === this.filter.category
           );
         }
 
-        // 按关键字过滤
         if (this.filter.q) {
           const qLower = this.filter.q.toLowerCase();
           result = result.filter(
@@ -118,6 +168,16 @@ export const useDataStore = defineStore('data', {
               (site.address && site.address.toLowerCase().includes(qLower))
           );
         }
+      }
+
+      // 如果是10分钟城市模式，按距离排序
+      if (this.filter.tenMinuteMode && this.filter.userLocation) {
+        const [userLat, userLon] = this.filter.userLocation;
+        result.sort((a, b) => {
+          const distA = this.calculateDistance(userLat, userLon, a.lat, a.lon);
+          const distB = this.calculateDistance(userLat, userLon, b.lat, b.lon);
+          return distA - distB;
+        });
       }
 
       this.sites = result;

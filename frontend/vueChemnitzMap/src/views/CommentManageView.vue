@@ -1,5 +1,22 @@
 <template>
-  <div class="comment-manage-container">
+  <div class="admin-container">
+    <div class="admin-nav">
+      <el-menu 
+        :default-active="'/admin/comments'" 
+        mode="horizontal"
+        @select="handleMenuSelect"
+      >
+        <el-menu-item index="/admin">
+          <el-icon><User /></el-icon>
+          <span>用户管理</span>
+        </el-menu-item>
+        <el-menu-item index="/admin/comments">
+          <el-icon><ChatLineSquare /></el-icon>
+          <span>评论管理</span>
+        </el-menu-item>
+      </el-menu>
+    </div>
+    
     <el-card>
       <template #header>
         <h2>评论管理</h2>
@@ -81,17 +98,23 @@
 </template>
 
 <script setup>
-import AdminLayout from '@/layouts/AdminLayout.vue';
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { fetchAllComments, deleteComment, batchDeleteComments } from '@/api';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
+const router = useRouter();
 const comments = ref([]);
 const loading = ref(false);
 const currentPage = ref(1);
 const pageSize = ref(20);
 const total = ref(0);
 const selectedComments = ref([]);
+
+// 处理菜单选择
+const handleMenuSelect = (index) => {
+  router.push(index);
+};
 
 // 格式化日期
 const formatDate = (dateString) => {
@@ -186,6 +209,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.admin-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-nav {
+  margin-bottom: 20px;
+}
+
 .batch-actions {
   margin-bottom: 20px;
   padding: 15px;
