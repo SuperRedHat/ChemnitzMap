@@ -22,6 +22,7 @@ function getInitialLanguage() {
 }
 
 const i18n = createI18n({
+  legacy: false, // 添加这一行！使用 Composition API 模式
   locale: getInitialLanguage(),
   fallbackLocale: 'en',
   messages: {
@@ -33,7 +34,7 @@ const i18n = createI18n({
 
 // 保存语言选择
 export function setLanguage(lang) {
-  i18n.global.locale = lang;
+  i18n.global.locale.value = lang; // 注意这里也要修改为 .value
   localStorage.setItem('language', lang);
   document.querySelector('html').setAttribute('lang', lang);
 }
