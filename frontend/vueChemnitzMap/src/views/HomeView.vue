@@ -5,11 +5,21 @@
       <h3>Categories</h3>
       <ul>
         <li
+          @click="handleNearbyClick()"
+          :style="{ 
+            fontWeight: dataStore.filter.nearbyMode ? 'bold' : 'normal',
+            color: dataStore.filter.nearbyMode ? '#FF8C00' : '#333'
+          }"
+        >
+          📍 Nearby
+        </li>
+        <li
           v-for="cat in dataStore.categories"
           :key="cat.id"
           :style="{
             color: cat.color,
-            fontWeight: dataStore.filter.category === cat.name ? 'bold' : 'normal'
+            fontWeight: (dataStore.filter.category === cat.name) || 
+                      (dataStore.filter.nearbyMode && dataStore.filter.category === cat.name) ? 'bold' : 'normal'
           }"
           @click="handleCategoryClick(cat.name)"  
         >
@@ -17,18 +27,39 @@
         </li>
         <li
           @click="handleCategoryClick('')"      
-          :style="{ fontStyle: dataStore.filter.category === '' ? 'italic' : 'normal' }"
+          :style="{ 
+            fontStyle: dataStore.filter.category === '' && !dataStore.filter.nearbyMode ? 'italic' : 'normal' 
+          }"
         >
           All
         </li>
       </ul>
+      <!-- 当处于 Nearby 模式时显示半径控制 -->
+      <div v-if="dataStore.filter.nearbyMode" class="nearby-controls">
+        <h4>扫描半径: {{ nearbyRadius }} 米</h4>
+        <el-slider 
+          v-model="nearbyRadius" 
+          :min="100" 
+          :max="5000" 
+          :step="100"
+          :marks="radiusMarks"
+          @change="onRadiusChange"
+        />
+        <!-- 显示当前分类 -->
+        <div v-if="dataStore.filter.category" class="current-category">
+          当前分类: <strong>{{ dataStore.filter.category }}</strong>
+        </div>
+      </div>
+      
+      <!-- 搜索框在 Nearby 模式下禁用 -->
       <input
         type="text"
         v-model="search"
         placeholder="Search..."
         @keyup.enter="onSearch"
+        :disabled="dataStore.filter.nearbyMode"
       />
-      <button @click="onSearch">Search</button>
+      <button @click="onSearch" :disabled="dataStore.filter.nearbyMode">Search</button>
     </aside>
 
     
@@ -92,7 +123,8 @@
 
 <script>
 import { http } from '@/api'; 
-import { ref, onMounted, nextTick, watch } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ElMessage } from 'element-plus';
 import { useDataStore }  from '@/stores/dataStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useFavoritesStore } from '@/stores/favoritesStore';
@@ -111,15 +143,58 @@ L.Icon.Default.mergeOptions({
 export default {
   name: 'HomeView',
   setup() {
-    const redIcon = new L.Icon({
-      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-      iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-    });
+      const orangeIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png',
+        iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+    // 创建不同颜色的图标
+    const createColoredIcon = (color) => {
+      // 根据颜色名称映射到 Leaflet 彩色标记的 URL
+      const colorMap = {
+        'red': 'red',
+        'blue': 'blue', 
+        'green': 'green',
+        'orange': 'orange',
+        'yellow': 'gold',
+        'violet': 'violet',
+        'grey': 'grey',
+        'black': 'black'
+      };
+      
+      const leafletColor = colorMap[color] || 'blue';
+      
+      return new L.Icon({
+        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${leafletColor}.png`,
+        iconRetinaUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${leafletColor}.png`,
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+    };
+
+    // 根据十六进制颜色获取最接近的标记颜色
+    const getMarkerColorFromHex = (hexColor) => {
+      // 移除 # 号
+      const hex = hexColor.replace('#', '');
+      
+      // 颜色映射表
+      const colorMappings = {
+        '#FF5733': 'red',      // Theatre - 红色
+        '#33A1FF': 'blue',     // Museum - 蓝色  
+        '#33FF57': 'green',    // Public Art - 绿色
+        '#FF33A1': 'violet'    // Restaurant - 紫色
+      };
+      
+      return colorMappings[hexColor] || 'blue';
+    };
     const dataStore = useDataStore();
     const authStore = useAuthStore();
     const favoritesStore = useFavoritesStore();
@@ -132,7 +207,6 @@ export default {
     const userLocation = ref(null);
     const userLocationMarker = ref(null);
     const showNearby = ref(false);
-    const nearbyRadius = ref(1000); // 默认1公里
     
     // 获取浏览器定位并移动地图
     const getCurrentLocation = () => {
@@ -141,7 +215,7 @@ export default {
         return;
       }
       navigator.geolocation.getCurrentPosition(
-        async ({ coords }) => {  // 注意这里添加了 async
+        async ({ coords }) => {
           const { latitude, longitude } = coords;
 
           // 如果之前已有定位标记，先移除它
@@ -149,8 +223,8 @@ export default {
             map.removeLayer(userLocationMarker.value);
           }
 
-          // 新建一个带红色图标的 Marker
-          const marker = L.marker([latitude, longitude], { icon: redIcon })
+          // 新建一个带橙色图标的 Marker（修改这里）
+          const marker = L.marker([latitude, longitude], { icon: orangeIcon })
             .addTo(map)
             .bindPopup('您在这里')
             .openPopup();
@@ -221,6 +295,39 @@ export default {
         
         locationButton.addTo(map);
       }
+      // 添加图例
+      const legend = L.control({ position: 'bottomright' });
+
+      legend.onAdd = function(map) {
+        const div = L.DomUtil.create('div', 'info legend');
+        div.style.backgroundColor = 'white';
+        div.style.padding = '10px';
+        div.style.borderRadius = '5px';
+        div.style.boxShadow = '0 0 15px rgba(0,0,0,0.2)';
+        
+        const categories = [
+          { name: 'Theatre', color: '#FF5733', icon: '🎭' },
+          { name: 'Museum', color: '#33A1FF', icon: '🏛️' },
+          { name: 'Public Art', color: '#33FF57', icon: '🎨' },
+          { name: 'Restaurant', color: '#FF33A1', icon: '🍽️' }
+        ];
+        
+        let legendHtml = '<h4 style="margin: 0 0 5px 0">文化地点类别</h4>';
+        
+        categories.forEach(cat => {
+          legendHtml += `
+            <div style="margin: 5px 0">
+              <span style="color: ${cat.color}; font-size: 1.2em">${cat.icon}</span>
+              <span>${cat.name}</span>
+            </div>
+          `;
+        });
+        
+        div.innerHTML = legendHtml;
+        return div;
+      };
+
+      legend.addTo(map);
     };
 
 
@@ -234,7 +341,15 @@ export default {
       
       // 添加新标记
       dataStore.sites.forEach(site => {
-        const marker = L.marker([site.lat, site.lon]).addTo(map);
+        const markerColor = getMarkerColorFromHex(site.color);
+        const coloredIcon = createColoredIcon(markerColor);
+        
+        const marker = L.marker([site.lat, site.lon], { icon: coloredIcon }).addTo(map);
+        
+        // 如果在 Nearby 模式下，添加特殊样式
+        if (dataStore.filter.nearbyMode) {
+          marker._icon.classList.add('nearby-marker');
+        }
         
         // 创建弹窗内容
         const isFavorited = favoritesStore.isFavorited(site.id);
@@ -303,15 +418,21 @@ export default {
       });
     };
 
+    
+
     // 点击分类
     const handleCategoryClick = (category) => {
-      // 1. 清空搜索框和 store 中的 q
-      search.value = ''
-      dataStore.setQuery('')    // 内部会清空 filter.q 并重新 applyFilter()
-
-      // 2. 设置新的分类
-      dataStore.setCategory(category)  // 内部会 applyFilter()
-    }
+      if (dataStore.filter.nearbyMode) {
+        // 在 Nearby 模式下，设置分类但不退出 Nearby 模式
+        dataStore.filter.category = category;
+        dataStore.applyFilter();
+      } else {
+        // 正常模式下的原有逻辑
+        search.value = '';
+        dataStore.setQuery('');
+        dataStore.setCategory(category);
+      }
+    };
 
     // 搜索执行
     const onSearch = () => {
@@ -381,7 +502,173 @@ export default {
       await dataStore.loadCategories()  // 拉分类
       await dataStore.loadAllSites()       // 拉站点
       updateMarkers()
-    })
+    });
+
+    // 新增的响应式数据
+    const nearbyRadius = ref(1000);
+    const nearbyCircle = ref(null);
+    const watchId = ref(null);
+    
+    // 半径滑块的标记点
+    const radiusMarks = {
+      100: '100m',
+      500: '500m',
+      1000: '1km',
+      2000: '2km',
+      5000: '5km'
+    };
+
+    // 处理 Nearby 点击
+    const handleNearbyClick = () => {
+      if (!navigator.geolocation) {
+        ElMessage.warning('浏览器不支持定位功能');
+        return;
+      }
+
+      if (dataStore.filter.nearbyMode) {
+        // 关闭 Nearby 模式
+        stopNearbyMode();
+      } else {
+        // 开启 Nearby 模式
+        startNearbyMode();
+      }
+    };
+
+    // 开启 Nearby 模式
+    const startNearbyMode = () => {
+      // 先清空搜索框
+      search.value = '';
+      
+      // 获取当前位置
+      if (userLocation.value) {
+        // 如果已有位置，直接使用
+        dataStore.setNearbyMode(true, userLocation.value);
+        drawNearbyCircle();
+        scanNearbyPlaces();
+      } else {
+        // 否则获取新位置
+        getCurrentLocationForNearby();
+      }
+
+      // 开始监听位置变化
+      if ('geolocation' in navigator) {
+        watchId.value = navigator.geolocation.watchPosition(
+          (position) => {
+            const newLocation = [position.coords.latitude, position.coords.longitude];
+            userLocation.value = newLocation;
+            dataStore.updateUserLocation(newLocation);
+            
+            // 更新圆形覆盖层
+            if (nearbyCircle.value) {
+              nearbyCircle.value.setLatLng(newLocation);
+            }
+            
+            // 重新扫描
+            scanNearbyPlaces();
+          },
+          (error) => {
+            console.error('位置监听错误:', error);
+          },
+          { enableHighAccuracy: true, maximumAge: 30000, timeout: 27000 }
+        );
+      }
+    };
+
+    // 停止 Nearby 模式
+    const stopNearbyMode = () => {
+      dataStore.setNearbyMode(false);
+      
+      // 停止位置监听
+      if (watchId.value) {
+        navigator.geolocation.clearWatch(watchId.value);
+        watchId.value = null;
+      }
+      
+      // 移除圆形覆盖层
+      if (nearbyCircle.value) {
+        map.removeLayer(nearbyCircle.value);
+        nearbyCircle.value = null;
+      }
+    };
+
+    // 获取位置（专门为 Nearby 模式）
+    const getCurrentLocationForNearby = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = [position.coords.latitude, position.coords.longitude];
+          userLocation.value = location;
+          
+          // 添加或更新用户位置标记
+          if (userLocationMarker.value) {
+            userLocationMarker.value.setLatLng(location);
+          } else {
+            const marker = L.marker(location, { icon: orangeIcon })
+              .addTo(map)
+              .bindPopup('您在这里');
+            userLocationMarker.value = marker;
+          }
+          
+          // 移动地图视角
+          map.setView(location, 15, { animate: true });
+          
+          // 设置 Nearby 模式
+          dataStore.setNearbyMode(true, location);
+          drawNearbyCircle();
+          scanNearbyPlaces();
+        },
+        (error) => {
+          console.error('获取位置失败:', error);
+          ElMessage.error('获取当前位置失败，请检查定位权限');
+        }
+      );
+    };
+
+    // 绘制半径圆形
+    const drawNearbyCircle = () => {
+      if (!userLocation.value || !map) return;
+      
+      // 移除旧的圆形
+      if (nearbyCircle.value) {
+        map.removeLayer(nearbyCircle.value);
+      }
+      
+      // 添加新的圆形
+      nearbyCircle.value = L.circle(userLocation.value, {
+        radius: nearbyRadius.value,
+        color: '#FF8C00',
+        fillColor: '#FF8C00',
+        fillOpacity: 0.1,
+        weight: 2
+      }).addTo(map);
+    };
+
+    // 扫描附近地点
+    const scanNearbyPlaces = () => {
+      if (!dataStore.filter.nearbyMode) return;
+      
+      const count = dataStore.sites.length;
+      const categoryText = dataStore.filter.category ? ` (${dataStore.filter.category})` : '';
+      
+      ElMessage.success({
+        message: `已收集 ${count} 个附近地点${categoryText}`,
+        duration: 2000,
+        offset: 100
+      });
+    };
+
+    // 半径改变时的处理
+    const onRadiusChange = (value) => {
+      dataStore.setNearbyRadius(value);
+      if (nearbyCircle.value) {
+        nearbyCircle.value.setRadius(value);
+      }
+      scanNearbyPlaces();
+    };
+
+    // 在组件卸载时清理
+    onUnmounted(() => {
+      stopNearbyMode();
+    });
 
     return {
       dataStore,
@@ -393,7 +680,11 @@ export default {
       handleCategoryClick,
       handleFavorite,
       viewDetails,
-      getCurrentLocation
+      getCurrentLocation,
+      nearbyRadius,
+      radiusMarks,
+      handleNearbyClick,
+      onRadiusChange
     };
   }
 };
@@ -536,5 +827,54 @@ export default {
   margin-left: 1rem;
   display: flex;
   gap: 0.5rem;
+}
+
+.nearby-controls {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.nearby-controls h4 {
+  margin: 0 0 0.5rem 0;
+  color: #FF8C00;
+  font-size: 0.9rem;
+}
+
+/* 高亮 Nearby 模式下的标记 */
+:deep(.nearby-marker) {
+  filter: drop-shadow(0 0 6px #FF8C00);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    filter: drop-shadow(0 0 6px #FF8C00);
+  }
+  50% {
+    filter: drop-shadow(0 0 12px #FF8C00);
+  }
+  100% {
+    filter: drop-shadow(0 0 6px #FF8C00);
+  }
+}
+
+/* 禁用状态的样式 */
+.filter-panel input:disabled,
+.filter-panel button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.current-category {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.current-category strong {
+  color: #FF8C00;
 }
 </style>

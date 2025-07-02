@@ -25,6 +25,10 @@ async function createApp() {
   // 先执行种子脚本
   await seedAdmin();
 
+  // 初始化评论表
+  const { initComments } = require('./scripts/initComments');
+  await initComments();
+
   // Swagger UI 路由 - 放在 API 路由之前
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -36,6 +40,7 @@ async function createApp() {
   app.use('/api/sites',      require('./routes/sites')(db));
   app.use('/api/users',      require('./routes/users')(db));
   app.use('/api/favorites',  require('./routes/favorites')(db));
+  app.use('/api/comments',   require('./routes/comments')(db));
 
   return app;
 }

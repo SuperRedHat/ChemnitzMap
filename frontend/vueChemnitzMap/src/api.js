@@ -26,3 +26,33 @@ export function fetchSites({ category, q } = {}) {
 // export function fetchSiteDetail(id) {
 //   return http.get(`/sites/${id}`).then(res => res.data);
 // }
+
+// 获取地点评论
+export function fetchSiteComments(siteId, params = {}) {
+  return http.get(`/comments/site/${siteId}`, { params }).then(res => res.data);
+}
+
+// 添加评论
+export function addComment(siteId, data) {
+  return http.post(`/comments/site/${siteId}`, data).then(res => res.data);
+}
+
+// 获取用户评论
+export function fetchUserComments(userId) {
+  return http.get(`/comments/user/${userId}`).then(res => res.data);
+}
+
+// 删除评论
+export function deleteComment(commentId) {
+  return http.delete(`/comments/${commentId}`).then(res => res.data);
+}
+
+// 获取所有评论（管理员）
+export function fetchAllComments(params = {}) {
+  return http.get('/comments/all/list', { params }).then(res => res.data);
+}
+
+// 批量删除评论（管理员）
+export function batchDeleteComments(commentIds) {
+  return http.post('/comments/batch-delete', { commentIds }).then(res => res.data);
+}

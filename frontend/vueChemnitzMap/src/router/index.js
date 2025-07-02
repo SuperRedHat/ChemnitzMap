@@ -49,8 +49,14 @@ const router = createRouter({
       name: 'admin',
       component: () => import('../views/AdminView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/comments',
+      name: 'admin-comments',
+      component: () => import('../views/CommentManageView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     }
-  ],
+  ]
 });
 
 // 路由守卫
