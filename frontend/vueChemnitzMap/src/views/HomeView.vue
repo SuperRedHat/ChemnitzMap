@@ -144,9 +144,30 @@ import { ElMessage } from 'element-plus';
 import { useDataStore } from '@/stores/dataStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useFavoritesStore } from '@/stores/favoritesStore';
+import { useFootprintsStore } from '@/stores/footprintsStore';
 import { http } from '@/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+// 处理收集地点
+const handleCollect = async (siteId, siteName) => {
+  const result = await footprintsStore.collectSite(siteId, siteName, userLocation.value);
+  if (result.needLogin) {
+    router.push('/login');
+  } else if (result.success) {
+    updateMarkers();
+  }
+};
+
+// 判断是否可以收集地点
+const canCollectSite = (site) => {
+  if (!userLocation.value) return false;
+  const distance = dataStore.calculateDistance(
+    userLocation.value[0], userLocation.value[1],
+    site.lat, site.lon
+  );
+  return distance <= 400;
+};
 
 // 修复 Leaflet 图标
 delete L.Icon.Default.prototype._getIconUrl;

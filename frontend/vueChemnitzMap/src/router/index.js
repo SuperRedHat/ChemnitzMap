@@ -40,6 +40,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/footprints',
+      name: 'footprints',
+      component: () => import('../views/FootprintsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/site/:id',
       name: 'site-detail',
       component: () => import('../views/SiteDetailView.vue'),

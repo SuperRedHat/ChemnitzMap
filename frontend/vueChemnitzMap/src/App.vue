@@ -3,10 +3,12 @@ import { RouterView } from 'vue-router';
 import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useFavoritesStore } from '@/stores/favoritesStore';
+import { useFootprintsStore } from '@/stores/footprintsStore';
 import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
 const favoritesStore = useFavoritesStore();
+const footprintsStore = useFootprintsStore();
 const router = useRouter();
 
 // 初始化时检查用户登录状态

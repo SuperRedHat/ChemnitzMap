@@ -29,6 +29,10 @@ async function createApp() {
   const { initComments } = require('./scripts/initComments');
   await initComments();
 
+  // 初始化足迹表
+  const { initFootprints } = require('./scripts/initFootprints');
+  await initFootprints();
+
   // Swagger UI 路由 - 放在 API 路由之前
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

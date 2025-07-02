@@ -56,3 +56,24 @@ export function fetchAllComments(params = {}) {
 export function batchDeleteComments(commentIds) {
   return http.post('/comments/batch-delete', { commentIds }).then(res => res.data);
 }
+
+// 足迹相关API
+export function collectSite(siteId, data) {
+  return http.post(`/footprints/${siteId}`, data).then(res => res.data);
+}
+
+export function fetchFootprints() {
+  return http.get('/footprints').then(res => res.data);
+}
+
+export function fetchFootprintStats() {
+  return http.get('/footprints/stats').then(res => res.data);
+}
+
+export function checkFootprintStatus(siteId) {
+  return http.get(`/footprints/check/${siteId}`).then(res => res.data);
+}
+
+export function deleteFootprint(siteId) {
+  return http.delete(`/footprints/${siteId}`).then(res => res.data);
+}
