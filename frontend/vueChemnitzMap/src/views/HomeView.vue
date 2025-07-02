@@ -149,13 +149,28 @@ import { http } from '@/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+const footprintsStore = useFootprintsStore();
+
 // 处理收集地点
 const handleCollect = async (siteId, siteName) => {
-  const result = await footprintsStore.collectSite(siteId, siteName, userLocation.value);
-  if (result.needLogin) {
-    router.push('/login');
-  } else if (result.success) {
-    updateMarkers();
+  try {
+    console.log('开始收集地点:', siteId, siteName); // 调试信息
+    
+    if (!userLocation.value) {
+      ElMessage.warning('请先获取当前位置');
+      return;
+    }
+    
+    const result = await footprintsStore.collectSite(siteId, siteName, userLocation.value);
+    if (result.needLogin) {
+      router.push('/login');
+    } else if (result.success) {
+      // 更新地图标记
+      updateMarkers();
+    }
+  } catch (error) {
+    console.error('收集地点失败:', error);
+    ElMessage.error('收集失败，请重试');
   }
 };
 
@@ -440,11 +455,28 @@ const createPopupContent = (site, isFavorited) => {
     'Restaurant': '🍽️'
   };
   
+  // 计算距离
+  let distance = null;
+  let canCollect = false;
+  let isCollected = footprintsStore.isCollected(site.id);
+  
+  if (userLocation.value) {
+    distance = Math.round(dataStore.calculateDistance(
+      userLocation.value[0], userLocation.value[1],
+      site.lat, site.lon
+    ));
+    canCollect = distance <= 400;
+  }
+  
+  // 转义单引号和其他特殊字符
+  const escapedName = (site.name || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+  
   return `
     <div style="padding: 5px;">
       <h4 style="margin: 0 0 8px 0; color: ${site.color}">${site.name}</h4>
       <p style="margin: 4px 0;"><strong>类别:</strong> ${site.category}</p>
       ${site.address ? `<p style="margin: 4px 0;"><strong>地址:</strong> ${site.address}</p>` : ''}
+      ${distance !== null ? `<p style="margin: 4px 0;"><strong>距离:</strong> ${distance}米</p>` : ''}
       <p style="margin: 8px 0; font-size: 0.9em;">${site.description || ''}</p>
       
       <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
@@ -454,6 +486,19 @@ const createPopupContent = (site, isFavorited) => {
       
       <div style="margin-top: 12px; text-align: center;">
         ${authStore.isAuthenticated ? `
+          ${!isCollected ? `
+            <button onclick="window.handleMapCollect(${site.id}, '${escapedName}')" 
+              style="padding: 6px 12px; margin: 0 4px; background: ${canCollect ? '#67c23a' : '#909399'}; 
+              color: white; border: none; border-radius: 4px; cursor: ${canCollect ? 'pointer' : 'not-allowed'};"
+              ${!canCollect ? 'disabled' : ''}>
+              ${canCollect ? '🎯 收集' : '🚫 太远了'}
+            </button>
+          ` : `
+            <div style="padding: 6px 12px; margin: 0 4px; background: #e6f7ff; 
+              border: 1px solid #91d5ff; border-radius: 4px; color: #1890ff;">
+              ✅ 已收集
+            </div>
+          `}
           <button onclick="window.handleMapFavorite(${site.id})" 
             style="padding: 6px 12px; margin: 0 4px; background: ${isFavorited ? '#ffc107' : '#f0f0f0'}; 
             border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
@@ -670,6 +715,11 @@ onUnmounted(() => {
     map = null;
   }
 });
+
+// 全局函数
+window.handleMapCollect = handleCollect;
+window.handleMapFavorite = handleFavorite;
+window.handleMapViewDetails = viewDetails;
 </script>
 
 <style scoped>

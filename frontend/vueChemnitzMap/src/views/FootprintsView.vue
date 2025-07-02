@@ -84,70 +84,72 @@
       <!-- 内容区域 -->
       <div v-loading="footprintsStore.loading" class="content-area">
         <!-- 卡片视图 -->
-        <div v-if="viewMode === 'card'" class="footprints-grid">
-          <el-empty v-if="footprintsStore.footprints.length === 0" description="开始你的探索之旅吧！" />
-          
-          <el-card 
-            v-for="footprint in footprintsStore.footprints" 
-            :key="footprint.id"
-            class="footprint-card"
-            shadow="hover"
-          >
-            <div class="footprint-header">
-              <h3 :style="{ color: footprint.color }">{{ footprint.name }}</h3>
-              <el-tag :color="footprint.color" effect="dark" size="small">
-                {{ footprint.category }}
-              </el-tag>
-            </div>
+        <div v-show="viewMode === 'card'" class="card-view-wrapper" >
+          <div class="footprints-grid">
+            <el-empty v-show="footprintsStore.footprints.length === 0" description="开始你的探索之旅吧！" />
+            
+            <el-card 
+              v-for="footprint in footprintsStore.footprints" 
+              :key="footprint.id"
+              class="footprint-card"
+              shadow="hover"
+            >
+              <div class="footprint-header">
+                <h3 :style="{ color: footprint.color }">{{ footprint.name }}</h3>
+                <el-tag :color="footprint.color" effect="dark" size="small">
+                  {{ footprint.category }}
+                </el-tag>
+              </div>
 
-            <div class="footprint-info">
-              <p v-if="footprint.address" class="address">
-                <el-icon><Location /></el-icon>
-                {{ footprint.address }}
-              </p>
-              <p class="time">
-                <el-icon><Clock /></el-icon>
-                收集于 {{ formatDate(footprint.collected_at) }}
-              </p>
-              <p class="distance" v-if="footprint.distance">
-                <el-icon><Position /></el-icon>
-                收集距离：{{ footprint.distance }}米
-              </p>
-            </div>
+              <div class="footprint-info">
+                <p v-if="footprint.address" class="address">
+                  <el-icon><Location /></el-icon>
+                  {{ footprint.address }}
+                </p>
+                <p class="time">
+                  <el-icon><Clock /></el-icon>
+                  收集于 {{ formatDate(footprint.collected_at) }}
+                </p>
+                <p class="distance" v-if="footprint.distance">
+                  <el-icon><Position /></el-icon>
+                  收集距离：{{ footprint.distance }}米
+                </p>
+              </div>
 
-            <div class="footprint-actions">
-              <el-button 
-                size="small" 
-                @click="viewOnMap(footprint)"
-              >
-                在地图查看
-              </el-button>
-              <el-button 
-                size="small" 
-                @click="viewDetails(footprint.site_id)"
-              >
-                查看详情
-              </el-button>
-              <el-button 
-                v-if="isDevelopment"
-                size="small" 
-                type="danger" 
-                plain
-                @click="removeFootprint(footprint.site_id)"
-              >
-                删除（测试）
-              </el-button>
-            </div>
-          </el-card>
+              <div class="footprint-actions">
+                <el-button 
+                  size="small" 
+                  @click="viewOnMap(footprint)"
+                >
+                  在地图查看
+                </el-button>
+                <el-button 
+                  size="small" 
+                  @click="viewDetails(footprint.site_id)"
+                >
+                  查看详情
+                </el-button>
+                <el-button 
+                  v-if="isDevelopment"
+                  size="small" 
+                  type="danger" 
+                  plain
+                  @click="removeFootprint(footprint.site_id)"
+                >
+                  删除（测试）
+                </el-button>
+              </div>
+            </el-card>
+          </div>
         </div>
 
         <!-- 地图视图 -->
-        <div v-else-if="viewMode === 'map'" class="map-container">
+        <div v-show="viewMode === 'map'" class="map-container">
           <div id="footprints-map" style="height: 600px;"></div>
         </div>
 
         <!-- 时间线视图 -->
-        <div v-else-if="viewMode === 'timeline'" class="timeline-container">
+        <div v-show="viewMode === 'timeline'" class="timeline-container">
           <el-timeline>
             <el-timeline-item
               v-for="footprint in sortedFootprints"
@@ -336,9 +338,15 @@ watch(viewMode, async (newMode) => {
   }
 });
 
-onMounted(() => {
+onMounted(async () => {
   footprintsStore.fetchFootprints();
   footprintsStore.fetchStats();
+  
+  // 如果使用 v-show，在组件挂载时就初始化地图
+  if (viewMode.value === 'map') {
+    await nextTick();
+    setTimeout(initMap, 100);
+  }
 });
 
 onUnmounted(() => {
@@ -347,9 +355,135 @@ onUnmounted(() => {
     footprintsMap = null;
   }
 });
+
+// 刷新地图
+const refreshMap = () => {
+  if (footprintsMap) {
+    setTimeout(() => {
+      // 先设置地图容器高度
+      const mapContainer = document.getElementById('footprints-map');
+      if (mapContainer) {
+        mapContainer.style.height = '500px'; // 与 content-area 高度一致
+      }
+      
+      footprintsMap.invalidateSize();
+      
+      // 如果有足迹，调整视图以包含所有标记
+      if (footprintsStore.footprints.length > 0) {
+        const bounds = L.latLngBounds(
+          footprintsStore.footprints.map(f => [f.lat, f.lon])
+        );
+        footprintsMap.fitBounds(bounds, { padding: [50, 50] });
+      }
+    }, 100);
+  }
+};
+
+// 修改 watch
+watch(viewMode, async (newMode) => {
+  if (newMode === 'map') {
+    await nextTick();
+    if (!footprintsMap) {
+      setTimeout(initMap, 100);
+    } else {
+      refreshMap();
+    }
+  }
+});
 </script>
 
 <style scoped>
+/* 美化所有滚动条 */
+.footprints-grid::-webkit-scrollbar,
+.timeline-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.footprints-grid::-webkit-scrollbar-track,
+.timeline-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.footprints-grid::-webkit-scrollbar-thumb,
+.timeline-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.footprints-grid::-webkit-scrollbar-thumb:hover,
+.timeline-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 内容区域 */
+.content-area {
+  height: 500px;
+  position: relative;
+}
+.card-view-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 卡片视图 */
+.footprints-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  padding: 0 10px 20px 0; /* 右侧留出滚动条空间 */
+  padding-bottom: 20px; /* 添加底部内边距 */
+}
+
+/* 地图容器 - 确保地图视图也有合适的高度 */
+.map-container {
+  height: 100%;
+  min-height: 400px;
+  max-height: calc(100vh - 500px);
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* 时间线容器 */
+.timeline-container {
+  padding: 20px;
+  max-height: calc(100vh - 500px);
+  overflow-y: auto;
+}
+
+/* 主容器调整 */
+.footprints-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: calc(100vh - 100px); /* 调整整体高度 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* el-card 调整 */
+.footprints-container .el-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* el-card__body 调整 */
+.footprints-container .el-card :deep(.el-card__body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
 .footprints-container {
   padding: 20px;
   max-width: 1400px;
@@ -498,17 +632,6 @@ onUnmounted(() => {
   text-align: center;
 }
 
-/* 内容区域 */
-.content-area {
-  min-height: 400px;
-}
-
-/* 卡片视图 */
-.footprints-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
-}
 
 .footprint-card {
   transition: transform 0.2s;
