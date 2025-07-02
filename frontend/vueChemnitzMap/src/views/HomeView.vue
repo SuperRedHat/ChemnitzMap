@@ -179,13 +179,15 @@ export default {
         popupAnchor: [1, -34],
         shadowSize: [41, 41]
       });
-
+    
     // 10分钟城市相关
     const travelTime = ref(10);
     const tenMinuteCircle = ref(null);
     const reachableDistance = computed(() => {
       return dataStore.calculateReachableDistance();
     });
+
+    const isLocating = ref(false);  // 防止并发定位请求
 
     // 时间滑块的标记点
     const timeMarks = {
@@ -408,8 +410,41 @@ export default {
         return;
       }
       
-      // 停止当前所有动画
-      map.stop();
+      // 如果正在定位中，直接返回
+      if (isLocating.value) {
+        console.log('正在定位中，请稍候...');
+        ElMessage.warning('正在定位中，请稍候...');
+        return;
+      }
+      
+      isLocating.value = true;
+      
+      // 确保地图存在
+      if (!map) {
+        isLocating.value = false;
+        return;
+      }
+      
+      // 保存当前的地图交互状态
+      const mapWasDragging = map.dragging.enabled();
+      const mapWasZooming = map.scrollWheelZoom.enabled();
+      const mapWasDoubleClickZoom = map.doubleClickZoom.enabled();
+      
+      // 禁用所有地图交互，防止在处理过程中用户操作导致冲突
+      map.dragging.disable();
+      map.scrollWheelZoom.disable();
+      map.doubleClickZoom.disable();
+      map.touchZoom.disable();
+      map.boxZoom.disable();
+      map.keyboard.disable();
+      
+      // 停止所有动画
+      try {
+        map.stop();
+        map.closePopup();
+      } catch (e) {
+        console.error('停止地图动画失败:', e);
+      }
       
       // 如果正在其他模式中，先退出
       if (dataStore.filter.nearbyMode) {
@@ -419,58 +454,158 @@ export default {
         stopTenMinuteMode();
       }
       
-      // 等待一帧，确保清理完成
-      requestAnimationFrame(() => {
-        navigator.geolocation.getCurrentPosition(
-          async ({ coords }) => {
-            const { latitude, longitude } = coords;
-
-            // 如果之前已有定位标记，先安全地移除它
-            if (userLocationMarker.value) {
-              try {
-                if (map.hasLayer(userLocationMarker.value)) {
-                  map.removeLayer(userLocationMarker.value);
+      // 获取定位
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          // 再次确认地图存在
+          if (!map || !map._container) {
+            isLocating.value = false;
+            return;
+          }
+          
+          // 设置用户位置
+          userLocation.value = [latitude, longitude];
+          
+          // 处理标记的函数
+          const processLocationMarker = () => {
+            try {
+              // 移除旧标记
+              if (userLocationMarker.value) {
+                try {
+                  if (userLocationMarker.value.getPopup()) {
+                    userLocationMarker.value.closePopup();
+                  }
+                  if (map.hasLayer(userLocationMarker.value)) {
+                    map.removeLayer(userLocationMarker.value);
+                  }
+                } catch (e) {
+                  console.error('移除旧标记失败:', e);
                 }
                 userLocationMarker.value = null;
-              } catch (e) {
-                console.error('移除旧标记失败:', e);
               }
+              
+              // 等待一帧，确保移除操作完成
+              requestAnimationFrame(() => {
+                if (!map || !map._container) {
+                  return;
+                }
+                
+                try {
+                  // 创建新标记
+                  const marker = L.marker([latitude, longitude], { 
+                    icon: orangeIcon,
+                    // 添加这些选项以避免动画问题
+                    riseOnHover: false,
+                    autoPan: false
+                  });
+                  
+                  // 添加到地图
+                  map.addLayer(marker);
+                  
+                  // 绑定弹窗
+                  marker.bindPopup('您在这里', {
+                    autoPan: false,
+                    animate: false
+                  });
+                  
+                  // 保存引用
+                  userLocationMarker.value = marker;
+                  
+                  // 设置视图（不使用动画）
+                  map.setView([latitude, longitude], 14, { 
+                    animate: false,
+                    duration: 0,
+                    noMoveStart: true,
+                    reset: true
+                  });
+                  
+                  // 延迟恢复地图交互和打开弹窗
+                  setTimeout(() => {
+                    // 恢复地图交互
+                    if (mapWasDragging) map.dragging.enable();
+                    if (mapWasZooming) map.scrollWheelZoom.enable();
+                    if (mapWasDoubleClickZoom) map.doubleClickZoom.enable();
+                    map.touchZoom.enable();
+                    map.boxZoom.enable();
+                    map.keyboard.enable();
+                    
+                    // 打开弹窗
+                    if (userLocationMarker.value && map.hasLayer(userLocationMarker.value)) {
+                      try {
+                        userLocationMarker.value.openPopup();
+                      } catch (e) {
+                        console.error('打开弹窗失败:', e);
+                      }
+                    }
+                    
+                    // 重置定位状态
+                    isLocating.value = false;
+                  }, 500);
+                  
+                } catch (e) {
+                  console.error('创建新标记失败:', e);
+                  // 出错时也要恢复地图交互
+                  if (mapWasDragging) map.dragging.enable();
+                  if (mapWasZooming) map.scrollWheelZoom.enable();
+                  if (mapWasDoubleClickZoom) map.doubleClickZoom.enable();
+                  map.touchZoom.enable();
+                  map.boxZoom.enable();
+                  map.keyboard.enable();
+                  isLocating.value = false;
+                }
+              });
+              
+            } catch (e) {
+              console.error('处理位置标记失败:', e);
+              // 确保恢复地图交互
+              if (mapWasDragging) map.dragging.enable();
+              if (mapWasZooming) map.scrollWheelZoom.enable();
+              if (mapWasDoubleClickZoom) map.doubleClickZoom.enable();
+              map.touchZoom.enable();
+              map.boxZoom.enable();
+              map.keyboard.enable();
+              isLocating.value = false;
             }
-
-            // 创建新标记
-            const marker = L.marker([latitude, longitude], { icon: orangeIcon })
-              .addTo(map)
-              .bindPopup('您在这里')
-              .openPopup();
-
-            // 保存到 ref
-            userLocationMarker.value = marker;
-            userLocation.value = [latitude, longitude];
-
-            // 将地图中心移动到当前位置（不使用动画，避免冲突）
-            map.setView([latitude, longitude], 14, { animate: false });
-
-            // 保存位置到用户资料
-            if (authStore.isAuthenticated) {
-              try {
-                await http.put('/users/me', {
-                  current_lat: latitude,
-                  current_lon: longitude
-                });
-                console.log('位置已保存到用户资料');
-                await authStore.fetchCurrentUser();
-              } catch (error) {
-                console.error('保存位置失败:', error);
-              }
-            }
-          },
-          (err) => {
-            console.error('获取定位失败', err);
-            alert('获取当前位置失败');
-          },
-          { enableHighAccuracy: true }
-        );
-      });
+          };
+          
+          // 立即处理标记
+          processLocationMarker();
+          
+          // 保存位置到用户资料（非阻塞）
+          if (authStore.isAuthenticated) {
+            http.put('/users/me', {
+              current_lat: latitude,
+              current_lon: longitude
+            }).then(() => {
+              console.log('位置已保存到用户资料');
+              return authStore.fetchCurrentUser();
+            }).catch(error => {
+              console.error('保存位置失败:', error);
+            });
+          }
+        },
+        (err) => {
+          console.error('获取定位失败', err);
+          ElMessage.error('获取当前位置失败');
+          
+          // 恢复地图交互
+          if (mapWasDragging) map.dragging.enable();
+          if (mapWasZooming) map.scrollWheelZoom.enable();
+          if (mapWasDoubleClickZoom) map.doubleClickZoom.enable();
+          map.touchZoom.enable();
+          map.boxZoom.enable();
+          map.keyboard.enable();
+          
+          isLocating.value = false;
+        },
+        { 
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
     };
 
     // 初始化地图
@@ -504,19 +639,22 @@ export default {
             L.DomEvent.stopPropagation(e);
             L.DomEvent.preventDefault(e);
             
-            // 添加防抖，避免快速点击
-            if (button.disabled) return;
+            // 检查是否正在定位
+            if (isLocating.value || button.disabled) {
+              ElMessage.warning('正在定位中，请稍候...');
+              return;
+            }
             
             button.disabled = true;
             button.style.opacity = '0.5';
             
             getCurrentLocation();
             
-            // 1秒后恢复按钮
+            // 3秒后恢复按钮
             setTimeout(() => {
               button.disabled = false;
               button.style.opacity = '1';
-            }, 1000);
+            }, 3000);
           });
           
           return button;
@@ -563,93 +701,128 @@ export default {
 
     // 更新地图标记
     const updateMarkers = () => {
+      // 确保地图存在且未被销毁
+      if (!map || !map._container) {
+        console.warn('地图尚未初始化或已被销毁');
+        return;
+      }
+      
+      // 停止可能的动画
+      try {
+        map.stop();
+      } catch (e) {
+        console.error('停止动画失败:', e);
+      }
+      
       // 清除旧标记
-      Object.values(markers).forEach(marker => {
-        map.removeLayer(marker);
+      Object.entries(markers).forEach(([id, marker]) => {
+        try {
+          if (marker && map.hasLayer(marker)) {
+            // 先关闭弹窗
+            if (marker.getPopup() && marker.isPopupOpen()) {
+              marker.closePopup();
+            }
+            // 移除标记
+            map.removeLayer(marker);
+          }
+        } catch (e) {
+          console.error(`移除标记 ${id} 失败:`, e);
+        }
       });
       
-      // 添加新标记
-      dataStore.sites.forEach(site => {
-        const markerColor = getMarkerColorFromHex(site.color);
-        const coloredIcon = createColoredIcon(markerColor);
+      // 清空标记对象
+      Object.keys(markers).forEach(key => delete markers[key]);
+      
+      // 延迟添加新标记，确保旧标记已完全清除
+      setTimeout(() => {
+        // 再次检查地图状态
+        if (!map || !map._container) return;
         
-        const marker = L.marker([site.lat, site.lon], { icon: coloredIcon }).addTo(map);
-        
-        // 如果在 Nearby 模式下，添加特殊样式
-        if (dataStore.filter.nearbyMode) {
-          marker._icon.classList.add('nearby-marker');
-        }
-        
-        // 如果在10分钟城市模式下，添加特殊样式
-        if (dataStore.filter.tenMinuteMode) {
-          marker._icon.classList.add('ten-minute-marker');
-        }
-        
-        // 创建弹窗内容
-        const isFavorited = favoritesStore.isFavorited(site.id);
-        const popupContent = `
-          <div style="min-width: 250px; max-width: 300px;">
-            <h4 style="margin: 0 0 8px 0; color: ${site.color}">
-              ${site.name}
-            </h4>
-            <p style="margin: 4px 0;"><strong>类别:</strong> ${site.category}</p>
-            ${site.address ? `<p style="margin: 4px 0;"><strong>地址:</strong> ${site.address}</p>` : ''}
+        dataStore.sites.forEach(site => {
+          try {
+            const markerColor = getMarkerColorFromHex(site.color);
+            const coloredIcon = createColoredIcon(markerColor);
             
+            const marker = L.marker([site.lat, site.lon], { icon: coloredIcon });
+            map.addLayer(marker);
             
-            <p style="margin: 8px 0; font-size: 0.9em; line-height: 1.4;">
-              ${site.description || ''}
-            </p>
+            // 如果在 Nearby 模式下，添加特殊样式
+            if (dataStore.filter.nearbyMode && marker._icon) {
+              marker._icon.classList.add('nearby-marker');
+            }
             
+            // 如果在10分钟城市模式下，添加特殊样式
+            if (dataStore.filter.tenMinuteMode && marker._icon) {
+              marker._icon.classList.add('ten-minute-marker');
+            }
             
-            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
-              ${site.category === 'Theatre' ? `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 1.5em;">🎭</span>
-                  <span style="font-size: 0.9em;">演出场所</span>
+            // 创建弹窗内容
+            const isFavorited = favoritesStore.isFavorited(site.id);
+            const popupContent = `
+              <div style="min-width: 250px; max-width: 300px;">
+                <h4 style="margin: 0 0 8px 0; color: ${site.color}">
+                  ${site.name}
+                </h4>
+                <p style="margin: 4px 0;"><strong>类别:</strong> ${site.category}</p>
+                ${site.address ? `<p style="margin: 4px 0;"><strong>地址:</strong> ${site.address}</p>` : ''}
+                
+                <p style="margin: 8px 0; font-size: 0.9em; line-height: 1.4;">
+                  ${site.description || ''}
+                </p>
+                
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+                  ${site.category === 'Theatre' ? `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 1.5em;">🎭</span>
+                      <span style="font-size: 0.9em;">演出场所</span>
+                    </div>
+                  ` : site.category === 'Museum' ? `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 1.5em;">🏛️</span>
+                      <span style="font-size: 0.9em;">文化展览</span>
+                    </div>
+                  ` : site.category === 'Public Art' ? `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 1.5em;">🎨</span>
+                      <span style="font-size: 0.9em;">公共艺术</span>
+                    </div>
+                  ` : site.category === 'Restaurant' ? `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 1.5em;">🍽️</span>
+                      <span style="font-size: 0.9em;">美食餐厅</span>
+                    </div>
+                  ` : ''}
                 </div>
-              ` : site.category === 'Museum' ? `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 1.5em;">🏛️</span>
-                  <span style="font-size: 0.9em;">文化展览</span>
+                
+                <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: center;">
+                  ${authStore.isAuthenticated ? `
+                    <button onclick="window.handleMapFavorite(${site.id})" 
+                      style="padding: 6px 12px; background: ${isFavorited ? '#ffc107' : '#f0f0f0'}; 
+                      border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                      ${isFavorited ? '★ 已收藏' : '☆ 收藏'}
+                    </button>
+                  ` : ''}
+                  <button onclick="window.handleMapViewDetails(${site.id})" 
+                    style="padding: 6px 12px; background: #409eff; color: white; 
+                    border: none; border-radius: 4px; cursor: pointer;">
+                    查看详情
+                  </button>
                 </div>
-              ` : site.category === 'Public Art' ? `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 1.5em;">🎨</span>
-                  <span style="font-size: 0.9em;">公共艺术</span>
-                </div>
-              ` : site.category === 'Restaurant' ? `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 1.5em;">🍽️</span>
-                  <span style="font-size: 0.9em;">美食餐厅</span>
-                </div>
-              ` : ''}
-            </div>
+                
+                <p style="margin: 8px 0 4px 0; font-size: 0.8em; color: #999;">
+                  OSM ID: ${site.osm_id || 'N/A'}<br/>
+                  坐标: ${site.lat.toFixed(6)}, ${site.lon.toFixed(6)}
+                </p>
+              </div>
+            `;
             
-            <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: center;">
-              ${authStore.isAuthenticated ? `
-                <button onclick="window.handleMapFavorite(${site.id})" 
-                  style="padding: 6px 12px; background: ${isFavorited ? '#ffc107' : '#f0f0f0'}; 
-                  border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
-                  ${isFavorited ? '★ 已收藏' : '☆ 收藏'}
-                </button>
-              ` : ''}
-              <button onclick="window.handleMapViewDetails(${site.id})" 
-                style="padding: 6px 12px; background: #409eff; color: white; 
-                border: none; border-radius: 4px; cursor: pointer;">
-                查看详情
-              </button>
-            </div>
-            
-            <p style="margin: 8px 0 4px 0; font-size: 0.8em; color: #999;">
-              OSM ID: ${site.osm_id || 'N/A'}<br/>
-              坐标: ${site.lat.toFixed(6)}, ${site.lon.toFixed(6)}
-            </p>
-          </div>
-        `;
-        
-        marker.bindPopup(popupContent);
-        markers[site.id] = marker;
-      });
+            marker.bindPopup(popupContent);
+            markers[site.id] = marker;
+          } catch (e) {
+            console.error(`创建标记失败 (site ${site.id}):`, e);
+          }
+        });
+      }, 50);
     };
 
     
@@ -925,30 +1098,71 @@ export default {
 
     // 在组件卸载时清理
     onUnmounted(() => {
+      // 停止所有正在进行的操作
+      isLocating.value = false;
+      
       stopNearbyMode();
       stopTenMinuteMode();
       
-      // 清理用户位置标记
-      if (userLocationMarker.value) {
+      // 确保地图存在
+      if (map) {
         try {
-          if (map && map.hasLayer(userLocationMarker.value)) {
-            map.removeLayer(userLocationMarker.value);
+          // 停止所有动画
+          map.stop();
+          
+          // 禁用所有交互
+          map.dragging.disable();
+          map.scrollWheelZoom.disable();
+          map.doubleClickZoom.disable();
+          map.touchZoom.disable();
+          map.boxZoom.disable();
+          map.keyboard.disable();
+          
+          // 清理用户位置标记
+          if (userLocationMarker.value) {
+            try {
+              if (userLocationMarker.value.getPopup()) {
+                userLocationMarker.value.closePopup();
+              }
+              if (map.hasLayer(userLocationMarker.value)) {
+                map.removeLayer(userLocationMarker.value);
+              }
+            } catch (e) {
+              console.error('清理用户位置标记失败:', e);
+            }
+            userLocationMarker.value = null;
           }
+          
+          // 清理所有地点标记
+          if (markers) {
+            Object.values(markers).forEach(marker => {
+              try {
+                if (marker && marker.getPopup()) {
+                  marker.closePopup();
+                }
+                if (marker && map.hasLayer(marker)) {
+                  map.removeLayer(marker);
+                }
+              } catch (e) {
+                console.error('清理地点标记失败:', e);
+              }
+            });
+          }
+          
+          // 移除地图
+          setTimeout(() => {
+            try {
+              map.remove();
+            } catch (e) {
+              console.error('移除地图失败:', e);
+            }
+            map = null;
+          }, 100);
+          
         } catch (e) {
-          console.error('清理用户位置标记失败:', e);
+          console.error('清理地图资源失败:', e);
         }
       }
-      
-      // 清理所有地点标记
-      Object.values(markers).forEach(marker => {
-        try {
-          if (map && map.hasLayer(marker)) {
-            map.removeLayer(marker);
-          }
-        } catch (e) {
-          console.error('清理地点标记失败:', e);
-        }
-      });
     });
 
     return {
@@ -970,7 +1184,8 @@ export default {
       timeMarks,
       reachableDistance,
       handleTenMinuteClick,
-      onTravelTimeChange
+      onTravelTimeChange,
+      isLocating
     };
   }
 };
