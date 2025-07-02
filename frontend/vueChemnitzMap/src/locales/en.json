@@ -164,58 +164,28 @@
     "tenMinuteModeOn": "10-minute city mode enabled, reachable range {distance} km"
   },
   "about": {
-    "title": "About Chemnitz Cultural Map",
-    "intro": {
-      "title": "Project Introduction",
-      "content": "Chemnitz Cultural Map is an interactive web application designed to help tourists and locals explore the rich cultural heritage of Chemnitz. Through an intuitive map interface, users can discover theaters, museums, public art, and restaurants throughout the city."
+    "subtitle": "Explore Urban Culture, Discover Wonderful Life",
+    "stats": {
+      "sites": "Cultural Sites",
+      "categories": "Categories",
+      "users": "Registered Users"
     },
-    "features": {
-      "title": "Feature Guide",
-      "mapBrowsing": {
-        "title": "Map Browsing",
-        "desc": "Interactive map showing all cultural sites with color-coded categories"
-      },
-      "searchFilter": {
-        "title": "Search & Filter",
-        "desc": "Filter by category or search by keywords to find specific places"
-      },
-      "userFeatures": {
-        "title": "User Features",
-        "desc": "Register to save favorites and track visited locations"
-      },
-      "specialModes": {
-        "title": "Special Modes",
-        "nearbyMode": "Nearby Mode: Discover places within walking distance",
-        "tenMinuteCity": "10-Minute City: Find places reachable by public transport"
-      }
-    },
-    "howTo": {
-      "title": "How to Use",
-      "step1": "Browse the map or use filters to find interesting places",
-      "step2": "Click on markers to view detailed information",
-      "step3": "Register an account to unlock personalized features",
-      "step4": "Collect places by visiting them in person (within 400m)",
-      "step5": "Track your progress and earn achievements"
-    },
-    "data": {
-      "title": "Data Source",
-      "content": "All location data is sourced from OpenStreetMap, a collaborative project to create a free editable map of the world. Data is regularly updated to ensure accuracy."
-    },
-    "tech": {
-      "title": "Technology Stack",
-      "frontend": "Frontend: Vue 3, Leaflet, Element Plus",
-      "backend": "Backend: Node.js, Express, MySQL",
-      "api": "API: RESTful architecture with JWT authentication"
-    },
-    "contact": {
-      "title": "Contact",
-      "content": "This project was developed as part of the Database and Web Technologies course at TU Chemnitz."
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "How do I collect places?",
+      "a1": "When you are within 400 meters of a place, click the 'Collect' button to add it to your footprints.",
+      "q2": "What is 10-Minute City mode?",
+      "a2": "This mode shows all cultural places you can reach within 10 minutes using public transport.",
+      "q3": "How do I earn achievement badges?",
+      "a3": "Collect different categories of places to earn achievements. Every 5 places in the same category earns you that category's badge.",
+      "q4": "Is my data secure?",
+      "a4": "We use industry-standard encryption to protect your information. Passwords are encrypted and location data is only recorded when you actively share it.",
+      "q5": "How can I contribute data?",
+      "a5": "Place data comes from OpenStreetMap. You can contribute new places by editing OpenStreetMap."
     }
   },
-  "categories": {
-    "Theatre": "Theatre",
-    "Museum": "Museum",
-    "Public Art": "Public Art",
-    "Restaurant": "Restaurant"
+  "common": {
+    "step": "Step",
+    "documentation": "Documentation"
   }
 }
