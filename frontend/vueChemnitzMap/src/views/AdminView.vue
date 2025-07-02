@@ -1,5 +1,21 @@
 <template>
   <div class="admin-container">
+    <div class="admin-nav">
+      <el-menu 
+        :default-active="'/admin'" 
+        mode="horizontal"
+        @select="handleMenuSelect"
+      >
+        <el-menu-item index="/admin">
+          <el-icon><User /></el-icon>
+          <span>用户管理</span>
+        </el-menu-item>
+        <el-menu-item index="/admin/comments">
+          <el-icon><ChatLineSquare /></el-icon>
+          <span>评论管理</span>
+        </el-menu-item>
+      </el-menu>
+    </div>
     <el-card>
       <template #header>
         <h2>用户管理</h2>
@@ -80,6 +96,8 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
+import AdminLayout from '@/layouts/AdminLayout.vue';
 import { ref, computed, onMounted } from 'vue';
 import { http } from '@/api';
 import { useAuthStore } from '@/stores/authStore';
@@ -88,6 +106,12 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 const authStore = useAuthStore();
 const users = ref([]);
 const loading = ref(false);
+const router = useRouter();
+
+// 处理菜单选择
+const handleMenuSelect = (index) => {
+  router.push(index);
+};
 
 // 计算统计数据
 const activeUserCount = computed(() => 
@@ -150,8 +174,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.admin-nav {
+  margin-bottom: 20px;
+}
+
 .admin-container {
-  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
