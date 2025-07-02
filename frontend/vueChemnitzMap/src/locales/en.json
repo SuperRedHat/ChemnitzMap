@@ -164,7 +164,55 @@
     "tenMinuteModeOn": "10-minute city mode enabled, reachable range {distance} km"
   },
   "about": {
+    "title": "About Chemnitz Cultural Map",
     "subtitle": "Explore Urban Culture, Discover Wonderful Life",
+    "intro": {
+      "title": "Project Introduction",
+      "content": "Chemnitz Cultural Map is an interactive web application designed to help tourists and residents discover the rich cultural resources of Chemnitz. Through an intuitive map interface and powerful search features, users can easily find theaters, museums, public art, and restaurants, creating their own cultural exploration journey."
+    },
+    "features": {
+      "title": "Feature Guide",
+      "mapBrowsing": {
+        "title": "Map Browsing",
+        "desc": "Interactive map shows all cultural sites with color-coded categories for easy identification"
+      },
+      "searchFilter": {
+        "title": "Search & Filter",
+        "desc": "Quick location search by keyword and category filtering"
+      },
+      "userFeatures": {
+        "title": "User Features",
+        "desc": "Register to save favorites and track your exploration footprints"
+      },
+      "specialModes": {
+        "title": "Special Modes",
+        "desc": "Nearby mode and 10-minute city mode for personalized exploration",
+        "nearbyMode": "Nearby Mode Demo",
+        "tenMinuteCity": "10-Minute City Demo"
+      }
+    },
+    "howTo": {
+      "title": "How to Use",
+      "step1": "Browse the map or use filters to find places of interest",
+      "step2": "Click markers for detailed information",
+      "step3": "Register an account to save favorites",
+      "step4": "Enable location services to collect nearby places",
+      "step5": "Earn achievement badges by exploring different categories"
+    },
+    "data": {
+      "title": "Data Sources",
+      "content": "All location data comes from OpenStreetMap, an open-source map project maintained by a global community. Data is updated regularly to ensure accuracy and completeness."
+    },
+    "tech": {
+      "title": "Technology Stack",
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "api": "API & Data"
+    },
+    "contact": {
+      "title": "Contact Information",
+      "content": "This project was developed as part of the Database and Web Technologies course at TU Chemnitz. For questions or suggestions, please refer to the project documentation."
+    },
     "stats": {
       "sites": "Cultural Sites",
       "categories": "Categories",
