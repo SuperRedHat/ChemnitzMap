@@ -1,0 +1,221 @@
+{
+  "app": {
+    "title": "Chemnitz Cultural Map",
+    "nav": {
+      "map": "Map",
+      "about": "About",
+      "login": "Login",
+      "register": "Register",
+      "profile": "Profile",
+      "favorites": "My Favorites",
+      "footprints": "My Footprints",
+      "admin": "Admin Panel",
+      "logout": "Logout"
+    }
+  },
+  "map": {
+    "categories": "Categories",
+    "all": "All",
+    "nearby": "Nearby",
+    "tenMinute": "10-min City",
+    "search": "Search...",
+    "searchButton": "Search",
+    "results": "Cultural Sites ({count} results)",
+    "loading": "Loading...",
+    "error": "Failed to load data",
+    "scanRadius": "Scan Radius: {radius} meters",
+    "travelTime": "Travel Time: {time} minutes",
+    "walkingTime": "Walking: {time} min",
+    "transitTime": "Transit: {time} min",
+    "reachableRange": "Reachable: {distance} km",
+    "currentCategory": "Current Category"
+  },
+  "site": {
+    "category": "Category",
+    "address": "Address",
+    "coordinates": "Coordinates",
+    "description": "Description",
+    "noDescription": "No description available",
+    "distance": "Distance",
+    "collect": "Collect",
+    "collected": "Collected",
+    "tooFar": "Too Far",
+    "favorite": "Favorite",
+    "favorited": "Favorited",
+    "viewDetails": "View Details",
+    "back": "Back"
+  },
+  "auth": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "login": "Login",
+    "register": "Register",
+    "loginTitle": "Login to Chemnitz Cultural Map",
+    "registerTitle": "Create New Account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "role": "Role",
+    "admin": "Admin",
+    "user": "User",
+    "registeredAt": "Registered at",
+    "currentLocation": "Current Location",
+    "notSet": "Not set",
+    "latitude": "Latitude",
+    "longitude": "Longitude"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email",
+    "minLength": "Minimum {min} characters required",
+    "passwordMatch": "Passwords do not match",
+    "loginFailed": "Invalid username or password",
+    "registerFailed": "Registration failed",
+    "updateFailed": "Update failed"
+  },
+  "profile": {
+    "title": "Profile",
+    "updatePassword": "Change Password",
+    "saveChanges": "Save Changes",
+    "reset": "Reset"
+  },
+  "favorites": {
+    "title": "My Favorites",
+    "count": "Total {count} favorites",
+    "empty": "No favorites yet",
+    "addedAt": "Favorited at",
+    "viewOnMap": "View on Map",
+    "remove": "Remove"
+  },
+  "footprints": {
+    "title": "My Footprints",
+    "subtitle": "Record your city exploration journey",
+    "progress": "Progress: Collected {current}/{total} ({percentage}%)",
+    "medals": "{count} medals",
+    "nextMilestone": "Next milestone: {current}/5",
+    "achievements": "Achievement Wall",
+    "museumLover": "Museum Lover",
+    "theaterFan": "Theater Fan",
+    "artCollector": "Art Collector",
+    "foodExplorer": "Food Explorer",
+    "firstExplore": "First Explore",
+    "cityWanderer": "City Wanderer",
+    "culturalAmbassador": "Cultural Ambassador",
+    "collectedAt": "Collected at",
+    "collectionDistance": "Collection distance",
+    "cardView": "Card View",
+    "mapView": "Map View",
+    "timeline": "Timeline"
+  },
+  "comment": {
+    "title": "User Reviews",
+    "rating": "Rating",
+    "avgRating": "{rating}",
+    "ratingCount": "({count} reviews)",
+    "writeReview": "Write Review",
+    "loginToReview": "Login to Review",
+    "alreadyReviewed": "You have already reviewed this place",
+    "noReviews": "No reviews yet",
+    "viewAll": "View all {count} reviews",
+    "submitReview": "Submit Review",
+    "reviewContent": "Review Content",
+    "shareExperience": "Share your experience...",
+    "ratingRequired": "Please select a rating",
+    "contentRequired": "Please enter review content",
+    "submitSuccess": "Review submitted successfully",
+    "deleteConfirm": "Are you sure to delete this review?",
+    "deleteSuccess": "Review deleted successfully"
+  },
+  "admin": {
+    "userManagement": "User Management",
+    "commentManagement": "Comment Management",
+    "totalUsers": "Total Users",
+    "activeUsers": "Active Users",
+    "adminCount": "Admins",
+    "deletedUsers": "Deleted Users",
+    "status": "Status",
+    "normal": "Normal",
+    "deleted": "Deleted",
+    "located": "Located",
+    "notLocated": "Not Located",
+    "operations": "Operations",
+    "delete": "Delete",
+    "self": "Self",
+    "deleteConfirm": "Are you sure to delete user \"{username}\"? This is a soft delete, the user will not be able to login.",
+    "batchDelete": "Batch Delete ({count})",
+    "clearSelection": "Clear Selection"
+  },
+  "messages": {
+    "welcome": "Welcome to Chemnitz Cultural Map",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "registerSuccess": "Registration successful",
+    "updateSuccess": "Update successful",
+    "deleteSuccess": "Delete successful",
+    "collectSuccess": "Successfully collected \"{name}\"!",
+    "favoriteSuccess": "Favorite successful",
+    "unfavoriteSuccess": "Unfavorite successful",
+    "locationRequired": "Please get current location first",
+    "locationFailed": "Failed to get location, please check location permission",
+    "nearbyModeOn": "Nearby mode enabled, scan radius {radius} meters",
+    "tenMinuteModeOn": "10-minute city mode enabled, reachable range {distance} km"
+  },
+  "about": {
+    "title": "About Chemnitz Cultural Map",
+    "intro": {
+      "title": "Project Introduction",
+      "content": "Chemnitz Cultural Map is an interactive web application designed to help tourists and locals explore the rich cultural heritage of Chemnitz. Through an intuitive map interface, users can discover theaters, museums, public art, and restaurants throughout the city."
+    },
+    "features": {
+      "title": "Feature Guide",
+      "mapBrowsing": {
+        "title": "Map Browsing",
+        "desc": "Interactive map showing all cultural sites with color-coded categories"
+      },
+      "searchFilter": {
+        "title": "Search & Filter",
+        "desc": "Filter by category or search by keywords to find specific places"
+      },
+      "userFeatures": {
+        "title": "User Features",
+        "desc": "Register to save favorites and track visited locations"
+      },
+      "specialModes": {
+        "title": "Special Modes",
+        "nearbyMode": "Nearby Mode: Discover places within walking distance",
+        "tenMinuteCity": "10-Minute City: Find places reachable by public transport"
+      }
+    },
+    "howTo": {
+      "title": "How to Use",
+      "step1": "Browse the map or use filters to find interesting places",
+      "step2": "Click on markers to view detailed information",
+      "step3": "Register an account to unlock personalized features",
+      "step4": "Collect places by visiting them in person (within 400m)",
+      "step5": "Track your progress and earn achievements"
+    },
+    "data": {
+      "title": "Data Source",
+      "content": "All location data is sourced from OpenStreetMap, a collaborative project to create a free editable map of the world. Data is regularly updated to ensure accuracy."
+    },
+    "tech": {
+      "title": "Technology Stack",
+      "frontend": "Frontend: Vue 3, Leaflet, Element Plus",
+      "backend": "Backend: Node.js, Express, MySQL",
+      "api": "API: RESTful architecture with JWT authentication"
+    },
+    "contact": {
+      "title": "Contact",
+      "content": "This project was developed as part of the Database and Web Technologies course at TU Chemnitz."
+    }
+  },
+  "categories": {
+    "Theatre": "Theatre",
+    "Museum": "Museum",
+    "Public Art": "Public Art",
+    "Restaurant": "Restaurant"
+  }
+}
