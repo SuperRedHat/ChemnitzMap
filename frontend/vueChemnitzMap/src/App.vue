@@ -16,6 +16,8 @@ onMounted(async () => {
   await authStore.fetchCurrentUser();
   if (authStore.isAuthenticated) {
     await favoritesStore.fetchFavorites();
+    await footprintsStore.fetchFootprints();
+    await footprintsStore.fetchStats();
   }
 });
 
@@ -34,7 +36,11 @@ const handleCommand = (command) => {
     case 'logout':
       authStore.logout();
       favoritesStore.clearFavorites();
+      footprintsStore.clearFootprints();
       router.push('/');
+      break;
+    case 'footprints':
+      router.push('/footprints');
       break;
   }
 };
@@ -64,6 +70,9 @@ const handleCommand = (command) => {
                   </el-dropdown-item>
                   <el-dropdown-item command="favorites" icon="Star">
                     我的收藏
+                  </el-dropdown-item>
+                  <el-dropdown-item command="footprints" icon="Position">
+                    我的足迹
                   </el-dropdown-item>
                   <el-dropdown-item 
                     v-if="authStore.isAdmin" 
