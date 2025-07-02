@@ -9,7 +9,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { setLanguage } from '@/locales';
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 
 // 计算当前语言名称
 const currentLanguageName = computed(() => {
@@ -25,6 +25,7 @@ const currentLanguageName = computed(() => {
 const handleLanguageChange = (lang) => {
   setLanguage(lang);
 };
+
 const authStore = useAuthStore();
 const favoritesStore = useFavoritesStore();
 const footprintsStore = useFootprintsStore();
@@ -68,15 +69,15 @@ const handleCommand = (command) => {
 <template>
   <div id="app">
     <header class="app-header">
-      <h1>Chemnitz Cultural Map</h1>
+      <h1>{{ $t('app.title') }}</h1>
       <nav>
-        <router-link to="/">地图</router-link>
-        <router-link to="/about">关于</router-link>
+        <router-link to="/">{{ $t('app.nav.map') }}</router-link>
+        <router-link to="/about">{{ $t('app.nav.about') }}</router-link>
         
         <!-- 添加语言切换器 -->
         <el-dropdown @command="handleLanguageChange" class="language-switcher">
           <span class="el-dropdown-link">
-            <el-icon><Translate /></el-icon>
+            <el-icon><Connection /></el-icon>
             {{ currentLanguageName }}
             <el-icon class="el-icon--right"><arrow-down /></el-icon>
           </span>
@@ -107,13 +108,13 @@ const handleCommand = (command) => {
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="profile" icon="User">
-                    个人资料
+                    {{ $t('app.nav.profile') }}
                   </el-dropdown-item>
                   <el-dropdown-item command="favorites" icon="Star">
-                    我的收藏
+                    {{ $t('app.nav.favorites') }}
                   </el-dropdown-item>
                   <el-dropdown-item command="footprints" icon="Position">
-                    我的足迹
+                    {{ $t('app.nav.footprints') }}
                   </el-dropdown-item>
                   <el-dropdown-item 
                     v-if="authStore.isAdmin" 
@@ -121,10 +122,10 @@ const handleCommand = (command) => {
                     icon="Setting"
                     divided
                   >
-                    管理后台
+                    {{ $t('app.nav.admin') }}
                   </el-dropdown-item>
                   <el-dropdown-item command="logout" icon="SwitchButton" divided>
-                    退出登录
+                    {{ $t('app.nav.logout') }}
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -132,8 +133,8 @@ const handleCommand = (command) => {
           </template>
           
           <template v-else>
-            <router-link to="/login" class="auth-link">登录</router-link>
-            <router-link to="/register" class="auth-link">注册</router-link>
+            <router-link to="/login" class="auth-link">{{ $t('app.nav.login') }}</router-link>
+            <router-link to="/register" class="auth-link">{{ $t('app.nav.register') }}</router-link>
           </template>
         </div>
       </nav>
@@ -145,6 +146,7 @@ const handleCommand = (command) => {
 </template>
 
 <style scoped>
+/* 保持原有样式不变 */
 /* 语言切换过渡效果 */
 .language-transition {
   transition: all 0.3s ease;
