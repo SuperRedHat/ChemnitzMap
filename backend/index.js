@@ -9,6 +9,11 @@ const mysql = require('mysql2/promise');
 const i18n = require('./config/i18n');
 const i18nMiddleware = require('./middleware/i18n');
 const { checkAndGenerateDocs } = require('./scripts/checkSwaggerCoverage');
+
+// 添加定时任务导入
+const cron = require('node-cron');
+const { updateSites } = require('./scripts/updateSites');
+
 app.use(cors()); 
 app.use(express.json());
 // i18n 中间件
@@ -83,11 +88,64 @@ async function createApp() {
   return app;
 }
 
+// 启动定时更新任务的函数
+function startScheduledUpdates() {
+  // 检查环境变量是否启用定时更新
+  const enableScheduledUpdates = process.env.ENABLE_SCHEDULED_UPDATES === 'true';
+  const updateCronSchedule = process.env.UPDATE_CRON_SCHEDULE || '0 2 * * 0'; // 默认每周日凌晨2点
+  
+  if (!enableScheduledUpdates) {
+    console.log('⏰ 定时更新功能已禁用');
+    return;
+  }
+
+  console.log(`⏰ 启动定时更新任务: ${updateCronSchedule}`);
+  
+  // 验证 cron 表达式
+  if (!cron.validate(updateCronSchedule)) {
+    console.error('❌ 无效的 cron 表达式:', updateCronSchedule);
+    return;
+  }
+
+  // 设置定时任务
+  cron.schedule(updateCronSchedule, async () => {
+    console.log('\n🕐 开始执行定时更新...');
+    try {
+      await updateSites();
+      console.log('✅ 定时更新完成\n');
+    } catch (error) {
+      console.error('❌ 定时更新失败:', error.message);
+    }
+  }, {
+    scheduled: true,
+    timezone: "Europe/Berlin" // 设置为德国时区
+  });
+
+  console.log('✅ 定时更新任务已启动');
+  
+  // 可选：在服务器启动时执行一次检查更新
+  const checkOnStartup = process.env.CHECK_UPDATES_ON_STARTUP === 'true';
+  if (checkOnStartup) {
+    console.log('🔄 服务器启动时检查数据更新...');
+    setTimeout(async () => {
+      try {
+        await updateSites();
+        console.log('✅ 启动时数据检查完成');
+      } catch (error) {
+        console.error('❌ 启动时数据检查失败:', error.message);
+      }
+    }, 10000); // 延迟10秒，确保数据库连接稳定
+  }
+}
+
 createApp().then(app => {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
     console.log(`🚀 Server listening on http://localhost:${PORT}`);
     console.log(`📚 API documentation: http://localhost:${PORT}/api-docs`);
+    
+    // 启动定时更新任务
+    startScheduledUpdates();
   });
 }).catch(err => {
   console.error('❌ Failed to start server:', err);

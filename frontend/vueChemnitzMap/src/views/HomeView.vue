@@ -4,34 +4,57 @@
     <aside class="filter-panel">
       <h3>{{ $t('map.categories') }}</h3>
       <ul>
-        <li
-          @click="handleNearbyClick()"
-          :class="{ active: dataStore.filter.nearbyMode }"
-          class="special-mode"
-        >
-          📍 {{ $t('map.nearby') }}
+        <!-- 附近模式 -->
+        <li class="special-mode-item nearby-mode" :class="{ active: dataStore.filter.nearbyMode }">
+          <div class="mode-content" @click="handleNearbyClick()">
+            <span class="mode-icon">📍</span>
+            <span class="mode-text">{{ $t('map.nearby') }}</span>
+          </div>
+          <el-switch
+            v-model="dataStore.filter.nearbyMode"
+            @change="handleNearbySwitchChange"
+            :disabled="dataStore.filter.tenMinuteMode"
+            size="small"
+            @click.stop
+          />
         </li>
-        <li
-          @click="handleTenMinuteClick()"
-          :class="{ active: dataStore.filter.tenMinuteMode }"
-          class="special-mode"
-        >
-          🚌 {{ $t('map.tenMinute') }}
+        <!-- 10分钟城市模式 -->
+        <li class="special-mode-item ten-minute-mode" :class="{ active: dataStore.filter.tenMinuteMode }">
+          <div class="mode-content" @click="handleTenMinuteClick()">
+            <span class="mode-icon">🚌</span>
+            <span class="mode-text">{{ $t('map.tenMinute') }}</span>
+          </div>
+          <el-switch
+            v-model="dataStore.filter.tenMinuteMode"
+            @change="handleTenMinuteSwitchChange"
+            :disabled="dataStore.filter.nearbyMode"
+            size="small"
+            @click.stop
+          />
         </li>
+        <!-- 普通分类 -->
         <li
           v-for="cat in dataStore.categories"
           :key="cat.id"
-          :style="{ color: cat.color }"
-          :class="{ active: dataStore.filter.category === cat.name }"
+          :class="{ active: dataStore.filter.category === cat.name && !isSpecialMode }"
+          class="category-item"
           @click="handleCategoryClick(cat.name)"
         >
-          {{ cat.name }}
+          <div class="category-content">
+            <span class="category-icon" :style="{ backgroundColor: cat.color }"></span>
+            <span class="category-text">{{ cat.name }}</span>
+          </div>
         </li>
+        <!-- 全部分类 -->
         <li
           @click="handleCategoryClick('')"
           :class="{ active: !dataStore.filter.category && !isSpecialMode }"
+          class="category-item all-category"
         >
-          {{ $t('map.all') }}
+          <div class="category-content">
+            <span class="category-icon all-icon">🌟</span>
+            <span class="category-text">{{ $t('map.all') }}</span>
+          </div>
         </li>
       </ul>
 
@@ -152,6 +175,24 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 const footprintsStore = useFootprintsStore();
+
+// 处理附近模式开关变化
+const handleNearbySwitchChange = (value) => {
+  if (value) {
+    startNearbyMode();
+  } else {
+    stopNearbyMode();
+  }
+};
+
+// 处理10分钟城市模式开关变化
+const handleTenMinuteSwitchChange = (value) => {
+  if (value) {
+    startTenMinuteMode();
+  } else {
+    stopTenMinuteMode();
+  }
+};
 
 // 处理收集地点
 const handleCollect = async (siteId, siteName) => {
@@ -735,17 +776,209 @@ window.handleMapViewDetails = viewDetails;
 
 /* 左侧过滤面板 */
 .filter-panel {
-  width: 250px;
+  width: 280px;
   padding: 1.5rem;
   background: #f5f5f5;
   border-right: 1px solid #ddd;
   overflow-y: auto;
   flex-shrink: 0;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+}
+
+/* 特殊模式样式 */
+.special-mode-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: white;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.special-mode-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.special-mode-item.active.nearby-mode {
+  border-color: #FF8C00;
+  background: linear-gradient(135deg, #fff5e6 0%, #ffe4b3 100%);
+}
+
+.special-mode-item.active.ten-minute-mode {
+  border-color: #1E90FF;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.mode-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  flex: 1;
+}
+
+.mode-icon {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+}
+
+.mode-text {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+/* 普通分类样式 */
+.category-item {
+  padding: 0;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: white;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.category-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-color: #e0e0e0;
+}
+
+.category-item.active {
+  border-color: #3498db;
+  background: linear-gradient(135deg, #ebf3fd 0%, #d1e7ff 100%);
+}
+
+.category-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  cursor: pointer;
+}
+
+.category-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.all-icon {
+  font-size: 1rem;
+  width: 16px !important;
+  height: 16px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%) !important;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.category-text {
+  font-weight: 500;
+  color: #2c3e50;
+  flex: 1;
+}
+
+/* 开关样式覆盖 */
+.filter-panel :deep(.el-switch) {
+  --el-switch-on-color: #3498db;
+  --el-switch-off-color: #dcdfe6;
+}
+
+.special-mode-item.nearby-mode :deep(.el-switch) {
+  --el-switch-on-color: #FF8C00;
+}
+
+.special-mode-item.ten-minute-mode :deep(.el-switch) {
+  --el-switch-on-color: #1E90FF;
+}
+
+/* 搜索框样式优化 */
+.filter-panel input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  background: white;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.filter-panel input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.filter-panel input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+.filter-panel button {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.filter-panel button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.filter-panel button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .filter-panel {
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .special-mode-item,
+  .category-item {
+    margin-bottom: 0.25rem;
+  }
+  
+  .mode-content,
+  .category-content {
+    padding: 0.5rem;
+  }
 }
 
 .filter-panel h3 {
-  margin: 0 0 1rem 0;
-  color: #333;
+  margin: 0 0 1.5rem 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #3498db;
 }
 
 .filter-panel ul {
@@ -897,9 +1130,10 @@ window.handleMapViewDetails = viewDetails;
 }
 
 .results-header {
-  padding: 0.5rem 1rem;
-  background: #f9f9f9;
-  border-bottom: 1px solid #eee;
+    flex-shrink: 0; /* 标题不收缩 */
+    padding: 0.5rem 1rem;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
 }
 
 .results-header h3 {
@@ -920,20 +1154,14 @@ window.handleMapViewDetails = viewDetails;
 /* 站点列表 */
 .site-list {
   flex: 1;
-  overflow-y: auto;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  overflow-y: auto; /* 关键：让列表可以滚动 */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
 }
 
 .site-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   border-bottom: 1px solid #eee;
-  cursor: pointer;
-  transition: background 0.2s;
 }
 
 .site-item:hover {
@@ -955,10 +1183,9 @@ window.handleMapViewDetails = viewDetails;
 }
 
 .site-details {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.85rem;
-  color: #666;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
 }
 
 .site-category {
@@ -973,15 +1200,33 @@ window.handleMapViewDetails = viewDetails;
 }
 
 .site-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-shrink: 0;
+    margin-top: 0.5rem;
+    justify-content: flex-end;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+.site-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .site-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .site-list::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 2px;
+  }
+  
+  .site-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.4);
+  }
+
   .home-container {
     flex-direction: column;
+    height: 100vh; /* 确保全屏高度 */
+    overflow: hidden; /* 防止整体页面滚动 */
   }
   
   .filter-panel {
@@ -989,20 +1234,30 @@ window.handleMapViewDetails = viewDetails;
     border-right: none;
     border-bottom: 1px solid #ddd;
     padding: 1rem;
-    max-height: 30vh;
+    max-height: 35vh; /* 稍微增加高度 */
+    overflow-y: auto; /* 确保过滤面板可以滚动 */
+    flex-shrink: 0; /* 防止收缩 */
   }
   
   .content-panel {
-    min-height: 70vh;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 65vh; /* 剩余高度 */
+    overflow: hidden; /* 防止内容溢出 */
   }
   
   #map-container {
-    min-height: 40vh;
+    height: 50%; /* 地图占内容区域的50% */
+    flex-shrink: 0; /* 防止地图被压缩 */
   }
   
   .results-section {
-    height: auto;
-    flex: 1;
+    height: 50%; /* 列表占内容区域的50% */
+    flex-shrink: 0; /* 防止列表区域被压缩 */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* 重要：防止整个区域滚动 */
   }
 }
 

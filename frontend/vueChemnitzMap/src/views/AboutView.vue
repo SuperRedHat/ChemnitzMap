@@ -112,7 +112,7 @@
                   <h3>{{ $t('about.features.specialModes.nearbyMode') }}</h3>
                 </div>
                 <el-image 
-                  src="/nearby-mode-demo.png" 
+                  :src="nearbyModeImage" 
                   fit="cover"
                   :alt="$t('about.features.specialModes.nearbyMode')"
                 >
@@ -131,7 +131,7 @@
                   <h3>{{ $t('about.features.specialModes.tenMinuteCity') }}</h3>
                 </div>
                 <el-image 
-                  src="/ten-minute-demo.png" 
+                  :src="tenMinuteImage"  
                   fit="cover"
                   :alt="$t('about.features.specialModes.tenMinuteCity')"
                 >
@@ -260,7 +260,9 @@ import {
 } from '@element-plus/icons-vue';
 import config from '@/config';
 import { fetchStats } from '@/api';  // 添加导入
-
+// 导入图片
+import nearbyModeImage from '@/assets/nearby.png';
+import tenMinuteImage from '@/assets/10min.png';
 const { t } = useI18n();
 const categoryStats = ref([]);
 
@@ -480,6 +482,12 @@ section {
 /* Special Features */
 .mode-card {
   height: 100%;
+  transition: all 0.3s ease;
+}
+
+.mode-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
 .mode-header {
@@ -492,6 +500,35 @@ section {
 .mode-header h3 {
   margin: 0;
   color: #303133;
+  font-weight: 600;
+}
+
+.mode-image {
+  width: 100%;
+  height: 250px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image-placeholder,
+.image-error {
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5f7fa;
+  color: #909399;
+}
+
+.image-error {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8f4fd 100%);
+}
+
+.image-error p {
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
 }
 
 .image-placeholder {
@@ -568,6 +605,16 @@ section {
 
 /* Responsive */
 @media (max-width: 768px) {
+
+  .mode-image {
+    height: 200px;
+  }
+  
+  .image-placeholder,
+  .image-error {
+    height: 200px;
+  }
+  
   .hero-title {
     font-size: 2rem;
   }
