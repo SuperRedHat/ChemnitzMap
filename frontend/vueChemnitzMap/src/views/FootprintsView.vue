@@ -3,15 +3,19 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <h2>我的足迹</h2>
-          <span class="subtitle">记录你的城市探索之旅</span>
+          <h2>{{ $t('footprints.title') }}</h2>
+          <span class="subtitle">{{ $t('footprints.subtitle') }}</span>
         </div>
       </template>
 
       <!-- 总进度 -->
       <div class="progress-section">
         <div class="progress-header">
-          <span class="progress-title">总进度：已收集 {{ stats.total }}/{{ stats.totalSites }} ({{ stats.percentage }}%)</span>
+          <span class="progress-title">{{ $t('footprints.progress', { 
+            current: stats.total, 
+            total: stats.totalSites, 
+            percentage: stats.percentage 
+          }) }}</span>
         </div>
         <el-progress 
           :percentage="Number(stats.percentage)" 
@@ -24,10 +28,10 @@
       <div class="medals-section">
         <div class="medals-display">
           <span v-for="i in stats.medals" :key="i" class="medal">🏅</span>
-          <span class="medal-count">{{ stats.medals }}枚勋章</span>
+          <span class="medal-count">{{ $t('footprints.medals', { count: stats.medals }) }}</span>
         </div>
         <div class="next-milestone">
-          <span>下一个里程碑：{{ stats.nextMilestoneProgress }}/5</span>
+          <span>{{ $t('footprints.nextMilestone', { current: stats.nextMilestoneProgress }) }}</span>
           <el-progress 
             :percentage="(stats.nextMilestoneProgress / 5) * 100" 
             :show-text="false"
@@ -39,7 +43,7 @@
 
       <!-- 成就墙 -->
       <div class="achievements-section">
-        <h3>成就墙</h3>
+        <h3>{{ $t('footprints.achievements') }}</h3>
         <div class="achievement-grid">
           <!-- 类别成就 -->
           <div 
@@ -75,9 +79,9 @@
       <!-- 切换视图 -->
       <div class="view-tabs">
         <el-radio-group v-model="viewMode" size="large">
-          <el-radio-button label="card">卡片视图</el-radio-button>
-          <el-radio-button label="map">地图视图</el-radio-button>
-          <el-radio-button label="timeline">时间线</el-radio-button>
+          <el-radio-button label="card">{{ $t('footprints.cardView') }}</el-radio-button>
+          <el-radio-button label="map">{{ $t('footprints.mapView') }}</el-radio-button>
+          <el-radio-button label="timeline">{{ $t('footprints.timeline') }}</el-radio-button>
         </el-radio-group>
       </div>
 
@@ -86,7 +90,7 @@
         <!-- 卡片视图 -->
         <div v-show="viewMode === 'card'" class="card-view-wrapper" >
           <div class="footprints-grid">
-            <el-empty v-show="footprintsStore.footprints.length === 0" description="开始你的探索之旅吧！" />
+            <el-empty v-show="footprintsStore.footprints.length === 0" :description="$t('footprints.startExploring')" />
             
             <el-card 
               v-for="footprint in footprintsStore.footprints" 
@@ -108,11 +112,11 @@
                 </p>
                 <p class="time">
                   <el-icon><Clock /></el-icon>
-                  收集于 {{ formatDate(footprint.collected_at) }}
+                  {{ $t('footprints.collectedAt') }} {{ formatDate(footprint.collected_at) }}
                 </p>
                 <p class="distance" v-if="footprint.distance">
                   <el-icon><Position /></el-icon>
-                  收集距离：{{ footprint.distance }}米
+                  {{ $t('footprints.collectionDistance') }}：{{ $t('footprints.meters', { distance: footprint.distance }) }}
                 </p>
               </div>
 
@@ -121,13 +125,13 @@
                   size="small" 
                   @click="viewOnMap(footprint)"
                 >
-                  在地图查看
+                  {{ $t('footprints.viewOnMap') }}
                 </el-button>
                 <el-button 
                   size="small" 
                   @click="viewDetails(footprint.site_id)"
                 >
-                  查看详情
+                  {{ $t('footprints.viewDetails') }}
                 </el-button>
                 <el-button 
                   v-if="isDevelopment"
@@ -136,7 +140,7 @@
                   plain
                   @click="removeFootprint(footprint.site_id)"
                 >
-                  删除（测试）
+                  {{ $t('footprints.deleteTest') }}
                 </el-button>
               </div>
             </el-card>
@@ -160,7 +164,7 @@
             >
               <el-card>
                 <h4 :style="{ color: footprint.color }">{{ footprint.name }}</h4>
-                <p>{{ footprint.category }} · {{ footprint.distance }}米</p>
+                <p>{{ footprint.category }} · {{ $t('footprints.meters', { distance: footprint.distance }) }}</p>
                 <p v-if="footprint.address">{{ footprint.address }}</p>
               </el-card>
             </el-timeline-item>
@@ -178,6 +182,9 @@ import { useFootprintsStore } from '@/stores/footprintsStore';
 import { useDataStore } from '@/stores/dataStore';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const router = useRouter();
 const footprintsStore = useFootprintsStore();
@@ -201,10 +208,10 @@ const progressColors = [
 // 类别成就计算
 const categoryAchievements = computed(() => {
   const achievements = [
-    { name: 'Museum', icon: '🏛️', title: '博物馆爱好者' },
-    { name: 'Theatre', icon: '🎭', title: '戏剧达人' },
-    { name: 'Public Art', icon: '🎨', title: '艺术收藏家' },
-    { name: 'Restaurant', icon: '🍽️', title: '美食探索者' }
+    { name: 'Museum', icon: '🏛️', title: t('footprints.museumLover') },
+    { name: 'Theatre', icon: '🎭', title: t('footprints.theaterFan') },
+    { name: 'Public Art', icon: '🎨', title: t('footprints.artCollector') },
+    { name: 'Restaurant', icon: '🍽️', title: t('footprints.foodExplorer') }
   ];
 
   return achievements.map(achievement => {
@@ -223,20 +230,20 @@ const specialAchievements = computed(() => {
   return [
     { 
       icon: '🌟', 
-      name: '初次探索', 
-      desc: '收集第1个地点',
+      name: t('footprints.firstExplore'), 
+      desc: t('footprints.firstExploreDesc'),
       achieved: total >= 1 
     },
     { 
       icon: '🚀', 
-      name: '城市漫游者', 
-      desc: '收集25个地点',
+      name: t('footprints.cityWanderer'), 
+      desc: t('footprints.cityWandererDesc'),
       achieved: total >= 25 
     },
     { 
       icon: '👑', 
-      name: '文化大使', 
-      desc: '收集100个地点',
+      name: t('footprints.culturalAmbassador'), 
+      desc: t('footprints.culturalAmbassadorDesc'),
       achieved: total >= 100 
     }
   ];
@@ -252,7 +259,8 @@ const sortedFootprints = computed(() => {
 // 格式化日期
 const formatDate = (dateString) => {
   if (!dateString) return '';
-  return new Date(dateString).toLocaleString('zh-CN', {
+  const locale = t('locale') === 'zh' ? 'zh-CN' : t('locale') === 'de' ? 'de-DE' : 'en-US';
+  return new Date(dateString).toLocaleString(locale, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -260,6 +268,7 @@ const formatDate = (dateString) => {
     minute: '2-digit'
   });
 };
+
 
 // 在地图上查看
 const viewOnMap = (footprint) => {
@@ -321,8 +330,8 @@ const initMap = async () => {
     marker.bindPopup(`
       <div style="padding: 5px;">
         <h4 style="margin: 0 0 8px 0; color: ${footprint.color}">${footprint.name}</h4>
-        <p style="margin: 4px 0;">收集于：${formatDate(footprint.collected_at)}</p>
-        <p style="margin: 4px 0;">距离：${footprint.distance}米</p>
+        <p style="margin: 4px 0;">${t('footprints.collectedAt')}：${formatDate(footprint.collected_at)}</p>
+        <p style="margin: 4px 0;">${t('footprints.collectionDistance')}：${t('footprints.meters', { distance: footprint.distance })}</p>
       </div>
     `);
     

@@ -32,9 +32,44 @@
     "nearbyRadius": "扫描半径：{radius} 米",
     "nearbyCategory": "当前分类",
     "transportInfo": {
-      "walking": "步行：{time}分钟",
-      "transit": "公交：{time}分钟",
-      "reachable": "可达：{distance}公里"
+      "walking": "步行时间：{time}分钟",
+      "transit": "公交时间：{time}分钟",
+      "reachable": "可达范围：{distance}公里"
+    },
+    "legend": {
+      "title": "文化地点类别",
+      "youAreHere": "您在这里"
+    },
+    "getLocation": "获取当前位置",
+    "locationNotSupported": "浏览器不支持定位功能",
+    "gettingLocation": "正在获取位置...",
+    "locationFailed": "获取当前位置失败，请检查定位权限",
+    "savingLocation": "正在保存位置...",
+    "exitMode": "请先退出{mode}模式",
+    "popup": {
+      "category": "类别",
+      "address": "地址",
+      "distance": "距离",
+      "meters": "{distance}米",
+      "collect": "收集",
+      "collected": "已收集",
+      "tooFar": "太远了",
+      "favorite": "收藏",
+      "favorited": "已收藏",
+      "viewDetails": "查看详情"
+    },
+    "timeMarks": {
+      "5min": "5分钟",
+      "10min": "10分钟",
+      "15min": "15分钟",
+      "20min": "20分钟",
+      "30min": "30分钟"
+    },
+    "radiusMarks": {
+      "500m": "500米",
+      "1km": "1公里",
+      "2km": "2公里",
+      "5km": "5公里"
     }
   },
   "site": {
@@ -60,7 +95,10 @@
     "publicArtInfo": "公共艺术信息",
     "publicArtDesc": "这是一件户外艺术作品，展现了城市的创意和文化活力。",
     "restaurantInfo": "餐厅信息",
-    "restaurantDesc": "品尝美味佳肴，体验当地和国际美食文化。"
+    "restaurantDesc": "品尝美味佳肴，体验当地和国际美食文化。",
+    "basicInfo": "基本信息",
+    "location": "位置",
+    "doesNotExist": "地点不存在"
   },
   "auth": {
     "username": "用户名",
@@ -82,7 +120,14 @@
     "currentLocation": "当前位置",
     "notSet": "未设置位置",
     "latitude": "纬度",
-    "longitude": "经度"
+    "longitude": "经度",
+    "usernameOrEmail": "用户名或邮箱",
+    "enterUsernameOrEmail": "请输入用户名或邮箱",
+    "enterPassword": "请输入密码",
+    "enterUsername": "请输入用户名",
+    "enterEmail": "请输入邮箱",
+    "enterPasswordHint": "请输入密码（至少6位）",
+    "confirmPasswordPlaceholder": "请再次输入密码"
   },
   "validation": {
     "required": "请填写此字段",
@@ -91,14 +136,25 @@
     "passwordMatch": "两次输入密码不一致",
     "loginFailed": "用户名或密码错误",
     "registerFailed": "注册失败",
-    "updateFailed": "更新失败"
+    "updateFailed": "更新失败",
+    "usernameOrEmailRequired": "请输入用户名或邮箱",
+    "passwordRequired": "请输入密码",
+    "usernameRequired": "请输入用户名",
+    "usernameLength": "用户名长度在 3 到 20 个字符",
+    "emailRequired": "请输入邮箱",
+    "emailFormat": "请输入正确的邮箱格式",
+    "passwordMinLength": "密码长度至少6位",
+    "passwordMismatch": "两次输入密码不一致!",
+    "confirmPasswordRequired": "请再次输入密码"
   },
   "profile": {
     "title": "个人资料",
     "updatePassword": "修改密码",
     "saveChanges": "保存修改",
     "reset": "重置",
-    "changePassword": "修改密码"
+    "changePassword": "修改密码",
+    "passwordPlaceholder": "如不修改密码请留空",
+    "newPasswordPlaceholder": "至少6位"
   },
   "favorites": {
     "title": "我的收藏",
@@ -107,7 +163,8 @@
     "addedAt": "收藏于",
     "viewOnMap": "在地图查看",
     "remove": "取消收藏",
-    "removeConfirm": "确定取消收藏？"
+    "removeConfirm": "确定取消收藏？",
+    "viewDetails": "查看详情"
   },
   "footprints": {
     "title": "我的足迹",
@@ -128,7 +185,16 @@
     "cardView": "卡片视图",
     "mapView": "地图视图",
     "timeline": "时间线",
-    "deleteConfirm": "确定删除这个足迹？（仅测试）"
+    "deleteConfirm": "确定删除这个足迹？（仅测试）",
+    "viewOnMap": "在地图查看",
+    "viewDetails": "查看详情",
+    "deleteTest": "删除（测试）",
+    "startExploring": "开始你的探索之旅吧！",
+    "firstExploreDesc": "收集第1个地点",
+    "cityWandererDesc": "收集25个地点",
+    "culturalAmbassadorDesc": "收集100个地点",
+    "meters": "{distance}米",
+    "category": "类别"
   },
   "comment": {
     "title": "用户评价",
@@ -147,7 +213,9 @@
     "contentRequired": "请输入评论内容",
     "submitSuccess": "评论发布成功",
     "deleteConfirm": "确定要删除这条评论吗？",
-    "deleteSuccess": "评论已删除"
+    "deleteSuccess": "评论已删除",
+    "deleteError": "删除失败",
+    "ratingTexts": ["很差", "差", "一般", "好", "很好"]
   },
   "admin": {
     "userManagement": "用户管理",
@@ -189,7 +257,20 @@
     "rating": "评分",
     "content": "内容",
     "commentTime": "评论时间",
-    "commenter": "用户"
+    "commenter": "用户",
+    "deleteConfirmTitle": "删除确认",
+    "confirmButtonText": "确定",
+    "cancelButtonText": "取消",
+    "fetchError": "获取用户列表失败",
+    "deleteSuccess": "删除成功",
+    "deleteError": "删除失败",
+    "viewSite": "查看地点",
+    "reviewContent": "评论内容",
+    "fetchCommentsError": "获取评论列表失败",
+    "batchDeleteConfirm": "确定要删除选中的 {count} 条评论吗？",
+    "batchDeleteConfirmTitle": "批量删除确认",
+    "batchDeleteSuccess": "批量删除成功",
+    "batchDeleteError": "批量删除失败"
   },
   "messages": {
     "welcome": "欢迎使用开姆尼茨文化地图",
@@ -203,8 +284,21 @@
     "unfavoriteSuccess": "已取消收藏",
     "locationRequired": "请先获取当前位置",
     "locationFailed": "获取当前位置失败，请检查定位权限",
-    "nearbyModeOn": "已开启附近模式，扫描半径 {radius} 米",
-    "tenMinuteModeOn": "已开启10分钟城市模式，可达范围 {distance} 公里"
+    "radiusUpdated": "扫描半径已更新为 {radius} 米",
+    "travelTimeUpdated": "出行时间已更新为 {time} 分钟，可达范围 {distance} 公里",
+    "loginFirst": "请先登录",
+    "registerFailed": "注册失败",
+    "loginFailed": "登录失败",
+    "updateFailed": "更新失败",
+    "favoriteFailed": "收藏失败",
+    "unfavoriteFailed": "取消收藏失败",
+    "collectFailed": "收集失败",
+    "locationError": "无法获取当前位置",
+    "footprintDeleted": "已删除足迹",
+    "deleteFailed": "删除失败",
+    "milestoneTitle": "🎉 恭喜达成里程碑！",
+    "milestoneMessage": "您已获得第 {count} 枚勋章！",
+    "tooFarMessage": "距离太远（当前距离：{distance}米）"
   },
   "about": {
     "title": "关于开姆尼茨文化地图",
@@ -226,10 +320,43 @@
       "a4": "我们采用行业标准的加密技术保护您的个人信息。您的密码经过加密存储，位置信息仅在您主动分享时才会被记录。",
       "q5": "如何贡献数据？",
       "a5": "本项目的地点数据来自OpenStreetMap。您可以通过编辑OpenStreetMap来贡献新的地点信息。"
+    },
+    "intro": {
+      "title": "项目介绍",
+      "content": "开姆尼茨文化地图是一个交互式网络应用，旨在帮助游客和居民发现开姆尼茨丰富的文化资源。通过直观的地图界面和强大的搜索功能，用户可以轻松找到剧院、博物馆、公共艺术和餐厅，创建自己的文化探索之旅。"
+    },
+    "features": {
+      "mapBrowsing": {
+        "desc": "交互式地图显示所有文化地点，通过颜色编码的类别便于识别"
+      },
+      "searchFilter": {
+        "desc": "通过关键词快速定位搜索和类别过滤"
+      },
+      "userFeatures": {
+        "desc": "注册以保存收藏和跟踪您的探索足迹"
+      },
+      "specialModes": {
+        "desc": "附近模式和10分钟城市模式，实现个性化探索"
+      }
     }
   },
   "common": {
     "step": "步骤",
-    "documentation": "文档"
+    "documentation": "文档",
+    "or": "或",
+    "back": "返回",
+    "cancel": "取消",
+    "confirm": "确定",
+    "delete": "删除"
+  },
+  "locale": "zh",
+  "errors": {
+    "loadCategoriesFailed": "加载分类失败",
+    "loadSitesFailed": "拉取站点失败",
+    "fetchFavoritesFailed": "获取收藏列表失败",
+    "checkFavoriteStatusFailed": "检查收藏状态失败",
+    "fetchFootprintsFailed": "获取足迹列表失败",
+    "fetchStatsFailed": "获取统计信息失败",
+    "checkCollectionStatusFailed": "检查收集状态失败"
   }
 }

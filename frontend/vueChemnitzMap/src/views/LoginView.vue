@@ -2,7 +2,7 @@
   <div class="login-container">
     <el-card class="login-card">
       <template #header>
-        <h2 class="login-title">登录 Chemnitz Cultural Map</h2>
+        <h2 class="login-title">{{ $t('auth.loginTitle') }}</h2>
       </template>
       
       <el-form 
@@ -12,20 +12,20 @@
         label-position="top"
         @submit.prevent="handleLogin"
       >
-        <el-form-item :label="$t('auth.username') + $t('common.or') + $t('auth.email')" prop="emailOrUsername">
+        <el-form-item :label="$t('auth.username') + ' ' + $t('common.or') + ' ' + $t('auth.email')" prop="emailOrUsername">
           <el-input 
             v-model="loginForm.emailOrUsername" 
-            placeholder="请输入用户名或邮箱"
+            :placeholder="$t('auth.enterUsernameOrEmail')"
             prefix-icon="User"
             size="large"
           />
         </el-form-item>
 
-        <el-form-item label="密码" prop="password">
+        <el-form-item :label="$t('auth.password')" prop="password">
           <el-input 
             v-model="loginForm.password" 
             type="password" 
-            placeholder="请输入密码"
+            :placeholder="$t('auth.enterPassword')"
             prefix-icon="Lock"
             size="large"
             show-password
@@ -40,7 +40,7 @@
             @click="handleLogin"
             style="width: 100%"
           >
-            登录
+            {{ $t('auth.login') }}
           </el-button>
         </el-form-item>
 
@@ -57,6 +57,9 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -70,11 +73,11 @@ const loginForm = reactive({
 
 const rules = {
   emailOrUsername: [
-    { required: true, message: '请输入用户名或邮箱', trigger: 'blur' }
+    { required: true, message: t('validation.usernameOrEmailRequired'), trigger: 'blur' }
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码长度至少6位', trigger: 'blur' }
+    { required: true, message: t('validation.passwordRequired'), trigger: 'blur' },
+    { min: 6, message: t('validation.passwordMinLength'), trigger: 'blur' }
   ]
 };
 

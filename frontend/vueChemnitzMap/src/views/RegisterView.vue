@@ -12,40 +12,40 @@
         label-position="top"
         @submit.prevent="handleRegister"
       >
-        <el-form-item label="用户名" prop="username">
+        <el-form-item :label="$t('auth.username')" prop="username">
           <el-input 
             v-model="registerForm.username" 
-            placeholder="请输入用户名"
+            :placeholder="$t('auth.enterUsername')"
             prefix-icon="User"
             size="large"
           />
         </el-form-item>
 
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item :label="$t('auth.email')" prop="email">
           <el-input 
             v-model="registerForm.email" 
-            placeholder="请输入邮箱"
+            :placeholder="$t('auth.enterEmail')"
             prefix-icon="Message"
             size="large"
           />
         </el-form-item>
 
-        <el-form-item label="密码" prop="password">
+        <el-form-item :label="$t('auth.password')" prop="password">
           <el-input 
             v-model="registerForm.password" 
             type="password" 
-            placeholder="请输入密码（至少6位）"
+            :placeholder="$t('auth.enterPasswordHint')"
             prefix-icon="Lock"
             size="large"
             show-password
           />
         </el-form-item>
 
-        <el-form-item label="确认密码" prop="confirmPassword">
+        <el-form-item :label="$t('auth.confirmPassword')" prop="confirmPassword">
           <el-input 
             v-model="registerForm.confirmPassword" 
             type="password" 
-            placeholder="请再次输入密码"
+            :placeholder="$t('auth.confirmPasswordPlaceholder')"
             prefix-icon="Lock"
             size="large"
             show-password
@@ -60,7 +60,7 @@
             @click="handleRegister"
             style="width: 100%"
           >
-            注册
+            {{ $t('auth.register') }}
           </el-button>
         </el-form-item>
 
@@ -74,10 +74,12 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
 const registerFormRef = ref();
@@ -92,31 +94,31 @@ const registerForm = reactive({
 
 const validatePassword = (rule, value, callback) => {
   if (value === '') {
-    callback(new Error('请再次输入密码'));
+    callback(new Error(t('validation.confirmPasswordRequired')));
   } else if (value !== registerForm.password) {
-    callback(new Error('两次输入密码不一致!'));
+    callback(new Error(t('validation.passwordMismatch')));
   } else {
     callback();
   }
 };
 
-const rules = {
+const rules = computed(() => ({
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' }
+    { required: true, message: t('validation.usernameRequired'), trigger: 'blur' },
+    { min: 3, max: 20, message: t('validation.usernameLength'), trigger: 'blur' }
   ],
   email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+    { required: true, message: t('validation.emailRequired'), trigger: 'blur' },
+    { type: 'email', message: t('validation.emailFormat'), trigger: 'blur' }
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码长度至少6位', trigger: 'blur' }
+    { required: true, message: t('validation.passwordRequired'), trigger: 'blur' },
+    { min: 6, message: t('validation.passwordMinLength'), trigger: 'blur' }
   ],
   confirmPassword: [
     { required: true, validator: validatePassword, trigger: 'blur' }
   ]
-};
+}));
 
 const handleRegister = async () => {
   const valid = await registerFormRef.value.validate().catch(() => false);

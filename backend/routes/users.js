@@ -1,78 +1,3 @@
-/**
- * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       required:
- *         - username
- *         - email
- *         - password
- *       properties:
- *         id:
- *           type: integer
- *           description: 用户ID
- *         username:
- *           type: string
- *           description: 用户名
- *         email:
- *           type: string
- *           description: 邮箱
- *         role:
- *           type: string
- *           enum: [user, admin]
- *           description: 用户角色
- *         current_lat:
- *           type: number
- *           description: 当前纬度
- *         current_lon:
- *           type: number
- *           description: 当前经度
- *         created_at:
- *           type: string
- *           format: date-time
- *           description: 创建时间
- */
-
-/**
- * @swagger
- * /users/register:
- *   post:
- *     summary: 用户注册
- *     tags: [用户管理]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - username
- *               - email
- *               - password
- *             properties:
- *               username:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       201:
- *         description: 注册成功
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 user:
- *                   $ref: '#/components/schemas/User'
- *                 token:
- *                   type: string
- */
-
 // backend/routes/users.js
 const express = require('express');
 const bcrypt = require('bcrypt');
@@ -88,18 +13,18 @@ module.exports = (db) => {
 
       // 验证必填字段
       if (!username || !email || !password) {
-        return res.status(400).json({ error: '请填写所有必填字段' });
+        return res.status(400).json({ error: req.__('errors.fillAllFields') });
       }
 
       // 验证邮箱格式
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: '邮箱格式不正确' });
+        return res.status(400).json({ error: req.__('errors.invalidEmail') });
       }
 
       // 验证密码强度
       if (password.length < 6) {
-        return res.status(400).json({ error: '密码长度至少6位' });
+        return res.status(400).json({ error: req.__('errors.passwordTooShort') });
       }
 
       // 检查用户名是否已存在
@@ -108,7 +33,7 @@ module.exports = (db) => {
         [username]
       );
       if (existingUsername.length > 0) {
-        return res.status(400).json({ error: '用户名已存在' });
+        return res.status(400).json({ error: req.__('errors.usernameExists') });
       }
 
       // 检查邮箱是否已存在
@@ -117,7 +42,7 @@ module.exports = (db) => {
         [email]
       );
       if (existingEmail.length > 0) {
-        return res.status(400).json({ error: '邮箱已被注册' });
+        return res.status(400).json({ error: req.__('errors.emailExists') });
       }
 
       // 加密密码
@@ -139,13 +64,13 @@ module.exports = (db) => {
       const token = generateToken(newUser[0]);
 
       res.status(201).json({
-        message: '注册成功',
+        message: req.__('messages.registerSuccess'),
         user: newUser[0],
         token
       });
     } catch (err) {
-      console.error('注册错误:', err);
-      res.status(500).json({ error: '注册失败，请稍后重试' });
+      console.error('Register error:', err);
+      res.status(500).json({ error: req.__('errors.registerFailed') });
     }
   });
 
@@ -155,7 +80,7 @@ module.exports = (db) => {
       const { emailOrUsername, password } = req.body;
 
       if (!emailOrUsername || !password) {
-        return res.status(400).json({ error: '请输入用户名/邮箱和密码' });
+        return res.status(400).json({ error: req.__('messages.enterUsernameAndPassword') });
       }
 
       // 查找用户（支持用户名或邮箱登录）
@@ -165,7 +90,7 @@ module.exports = (db) => {
       );
 
       if (users.length === 0) {
-        return res.status(401).json({ error: '用户名/邮箱或密码错误' });
+        return res.status(401).json({ error: req.__('errors.emailOrPasswordError') });
       }
 
       const user = users[0];
@@ -173,7 +98,7 @@ module.exports = (db) => {
       // 验证密码
       const passwordMatch = await bcrypt.compare(password, user.password_hash);
       if (!passwordMatch) {
-        return res.status(401).json({ error: '用户名/邮箱或密码错误' });
+        return res.status(401).json({ error: req.__('errors.emailOrPasswordError') });
       }
 
       // 生成 JWT Token
@@ -183,32 +108,32 @@ module.exports = (db) => {
       const { password_hash, ...userWithoutPassword } = user;
 
       res.json({
-        message: '登录成功',
+        message: req.__('messages.loginSuccess'),
         user: userWithoutPassword,
         token
       });
     } catch (err) {
-      console.error('登录错误:', err);
-      res.status(500).json({ error: '登录失败，请稍后重试' });
+      console.error('Login error:', err);
+      res.status(500).json({ error: req.__('errors.loginFailed') });
     }
   });
 
   // 获取当前用户信息
   router.get('/me', authenticateToken, async (req, res) => {
     try {
-    const [users] = await db.query(
-      'SELECT id, username, email, role, current_lat, current_lon, created_at FROM User WHERE id = ? AND deleted = 0',  
-      [req.user.id]
-    );
+      const [users] = await db.query(
+        'SELECT id, username, email, role, current_lat, current_lon, created_at FROM User WHERE id = ? AND deleted = 0',  
+        [req.user.id]
+      );
 
       if (users.length === 0) {
-        return res.status(404).json({ error: '用户不存在' });
+        return res.status(404).json({ error: req.__('errors.userNotFound') });
       }
 
       res.json(users[0]);
     } catch (err) {
-      console.error('获取用户信息错误:', err);
-      res.status(500).json({ error: '获取用户信息失败' });
+      console.error('Get user info error:', err);
+      res.status(500).json({ error: req.__('errors.getUserFailed') });
     }
   });
 
@@ -224,7 +149,7 @@ module.exports = (db) => {
 
       // 更新位置信息
       if (req.body.current_lat !== undefined && req.body.current_lon !== undefined) {
-        updates.push('current_lat = ?, current_lon = ?');  // 注意这里是一个字符串，不是两个
+        updates.push('current_lat = ?, current_lon = ?');
         params.push(req.body.current_lat, req.body.current_lon);
       }
 
@@ -235,7 +160,7 @@ module.exports = (db) => {
           [username, userId]
         );
         if (existing.length > 0) {
-          return res.status(400).json({ error: '用户名已存在' });
+          return res.status(400).json({ error: req.__('errors.usernameExists') });
         }
         updates.push('username = ?');
         params.push(username);
@@ -245,7 +170,7 @@ module.exports = (db) => {
         // 验证邮箱格式
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-          return res.status(400).json({ error: '邮箱格式不正确' });
+          return res.status(400).json({ error: req.__('errors.invalidEmail') });
         }
 
         // 检查邮箱是否已被其他用户使用
@@ -254,7 +179,7 @@ module.exports = (db) => {
           [email, userId]
         );
         if (existing.length > 0) {
-          return res.status(400).json({ error: '邮箱已被注册' });
+          return res.status(400).json({ error: req.__('errors.emailExists') });
         }
         updates.push('email = ?');
         params.push(email);
@@ -263,7 +188,7 @@ module.exports = (db) => {
       // 如果要修改密码
       if (newPassword) {
         if (!currentPassword) {
-          return res.status(400).json({ error: '请输入当前密码' });
+          return res.status(400).json({ error: req.__('messages.enterCurrentPassword') });
         }
 
         // 验证当前密码
@@ -273,12 +198,12 @@ module.exports = (db) => {
         );
         const passwordMatch = await bcrypt.compare(currentPassword, users[0].password_hash);
         if (!passwordMatch) {
-          return res.status(401).json({ error: '当前密码错误' });
+          return res.status(401).json({ error: req.__('errors.currentPasswordError') });
         }
 
         // 验证新密码强度
         if (newPassword.length < 6) {
-          return res.status(400).json({ error: '新密码长度至少6位' });
+          return res.status(400).json({ error: req.__('messages.newPasswordTooShort') });
         }
 
         const passwordHash = await bcrypt.hash(newPassword, 10);
@@ -287,7 +212,7 @@ module.exports = (db) => {
       }
 
       if (updates.length === 0) {
-        return res.status(400).json({ error: '没有要更新的内容' });
+        return res.status(400).json({ error: req.__('errors.noUpdateContent') });
       }
 
       // 执行更新
@@ -299,17 +224,17 @@ module.exports = (db) => {
 
       // 返回更新后的用户信息
       const [updatedUser] = await db.query(
-        'SELECT id, username, email, role, current_lat, current_lon, created_at FROM User WHERE id = ?',  // 添加位置字段
+        'SELECT id, username, email, role, current_lat, current_lon, created_at FROM User WHERE id = ?',
         [userId]
       );
 
       res.json({
-        message: '更新成功',
+        message: req.__('messages.updateSuccess'),
         user: updatedUser[0]
       });
     } catch (err) {
-      console.error('更新用户信息错误:', err);
-      res.status(500).json({ error: '更新失败' });
+      console.error('Update user info error:', err);
+      res.status(500).json({ error: req.__('errors.updateFailed') });
     }
   });
 
@@ -321,11 +246,12 @@ module.exports = (db) => {
       );
       res.json(users);
     } catch (err) {
-      console.error('获取用户列表错误:', err);
-      res.status(500).json({ error: '获取用户列表失败' });
+      console.error('Get user list error:', err);
+      res.status(500).json({ error: req.__('errors.fetchUserListFailed') });
     }
   });
 
+  // 获取已删除用户列表（仅管理员）
   router.get('/deleted/list', authenticateToken, requireAdmin, async (req, res) => {
     try {
       const [deletedUsers] = await db.query(
@@ -333,11 +259,10 @@ module.exports = (db) => {
       );
       res.json(deletedUsers);
     } catch (err) {
-      console.error('获取已删除用户列表错误:', err);
-      res.status(500).json({ error: '获取已删除用户列表失败' });
+      console.error('Get deleted users error:', err);
+      res.status(500).json({ error: req.__('errors.fetchDeletedUsersFailed') });
     }
   });
-
 
   // 删除用户（软删除，仅管理员）
   router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
@@ -346,7 +271,7 @@ module.exports = (db) => {
 
       // 不能删除自己
       if (userId == req.user.id) {
-        return res.status(400).json({ error: '不能删除自己的账号' });
+        return res.status(400).json({ error: req.__('errors.cannotDeleteSelf') });
       }
 
       // 执行软删除
@@ -355,10 +280,10 @@ module.exports = (db) => {
         [userId]
       );
 
-      res.json({ message: '用户已删除' });
+      res.json({ message: req.__('messages.userDeleted') });
     } catch (err) {
-      console.error('删除用户错误:', err);
-      res.status(500).json({ error: '删除失败' });
+      console.error('Delete user error:', err);
+      res.status(500).json({ error: req.__('errors.deleteFailed') });
     }
   });
 

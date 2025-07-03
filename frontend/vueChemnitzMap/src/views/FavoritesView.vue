@@ -3,13 +3,13 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <h2>我的收藏</h2>
-          <span class="count">共 {{ favoritesStore.favoriteCount }} 个收藏</span>
+          <h2>{{ $t('favorites.title') }}</h2>
+          <span class="count">{{ $t('favorites.count', { count: favoritesStore.favoriteCount }) }}</span>
         </div>
       </template>
 
       <div v-loading="favoritesStore.loading">
-        <el-empty v-if="favoritesStore.favorites.length === 0" description="暂无收藏" />
+        <el-empty v-if="favoritesStore.favorites.length === 0" :description="$t('favorites.empty')" />
         
         <div v-else class="favorites-grid">
           <el-card 
@@ -32,7 +32,7 @@
               </p>
               <p class="time">
                 <el-icon><Clock /></el-icon>
-                收藏于 {{ formatDate(site.favorited_at) }}
+                {{ $t('favorites.addedAt') }} {{ formatDate(site.favorited_at) }}
               </p>
             </div>
 
@@ -41,13 +41,13 @@
                 size="small" 
                 @click="viewOnMap(site)"
               >
-                在地图查看
+                {{ $t('favorites.viewOnMap') }}
               </el-button>
               <el-button 
                 size="small" 
                 @click="viewDetails(site.id)"
               >
-                查看详情
+                {{ $t('favorites.viewDetails') }}
               </el-button>
               <el-button 
                 size="small" 
@@ -55,7 +55,7 @@
                 plain
                 @click="removeFavorite(site.id)"
               >
-                取消收藏
+                {{ $t('favorites.remove') }}
               </el-button>
             </div>
           </el-card>
@@ -75,9 +75,14 @@ const router = useRouter();
 const favoritesStore = useFavoritesStore();
 const dataStore = useDataStore();
 
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
 const formatDate = (dateString) => {
   if (!dateString) return '';
-  return new Date(dateString).toLocaleString('zh-CN', {
+  const locale = t('locale') === 'zh' ? 'zh-CN' : t('locale') === 'de' ? 'de-DE' : 'en-US';
+  return new Date(dateString).toLocaleString(locale, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -107,6 +112,47 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.favorites-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+}
+
+.favorites-container .el-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 使卡片内容可滚动 */
+.favorites-container .el-card :deep(.el-card__body) {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 优化滚动条样式 */
+.favorites-container ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.favorites-container ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.favorites-container ::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.favorites-container ::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .favorites-container {
   padding: 20px;
   max-width: 1200px;

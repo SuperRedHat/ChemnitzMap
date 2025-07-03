@@ -42,8 +42,8 @@ module.exports = (db) => {
         ratingCount: avgResult.count || 0
       });
     } catch (err) {
-      console.error('获取评论列表错误:', err);
-      res.status(500).json({ error: '获取评论失败' });
+      console.error('Get comments error:', err);
+      res.status(500).json({ error: req.__('errors.fetchCommentsFailed') });
     }
   });
 
@@ -56,11 +56,11 @@ module.exports = (db) => {
 
       // 验证输入
       if (!rating || rating < 1 || rating > 5) {
-        return res.status(400).json({ error: '请选择1-5星评分' });
+        return res.status(400).json({ error: req.__('errors.invalidRating') });
       }
 
       if (!text || text.trim().length === 0) {
-        return res.status(400).json({ error: '请输入评论内容' });
+        return res.status(400).json({ error: req.__('errors.commentRequired') });
       }
 
       // 检查用户是否已经评论过
@@ -70,7 +70,7 @@ module.exports = (db) => {
       );
 
       if (existing.length > 0) {
-        return res.status(400).json({ error: '您已经评论过该地点' });
+        return res.status(400).json({ error: req.__('errors.alreadyCommented') });
       }
 
       // 插入评论
@@ -79,10 +79,10 @@ module.exports = (db) => {
         [siteId, userId, rating, text.trim()]
       );
 
-      res.status(201).json({ message: '评论发布成功' });
+      res.status(201).json({ message: req.__('messages.commentPublished') });
     } catch (err) {
-      console.error('添加评论错误:', err);
-      res.status(500).json({ error: '发布评论失败' });
+      console.error('Add comment error:', err);
+      res.status(500).json({ error: req.__('errors.publishCommentFailed') });
     }
   });
 
@@ -103,8 +103,8 @@ module.exports = (db) => {
 
       res.json(comments);
     } catch (err) {
-      console.error('获取用户评论错误:', err);
-      res.status(500).json({ error: '获取评论失败' });
+      console.error('Get user comments error:', err);
+      res.status(500).json({ error: req.__('errors.fetchCommentsFailed') });
     }
   });
 
@@ -122,21 +122,21 @@ module.exports = (db) => {
       );
 
       if (!comment) {
-        return res.status(404).json({ error: '评论不存在' });
+        return res.status(404).json({ error: req.__('errors.commentNotFound') });
       }
 
       // 检查权限：只能删除自己的评论，管理员可以删除任何评论
       if (comment.user_id !== userId && !isAdmin) {
-        return res.status(403).json({ error: '无权删除此评论' });
+        return res.status(403).json({ error: req.__('errors.noPermissionToDelete') });
       }
 
       // 删除评论
       await db.query('DELETE FROM Comment WHERE id = ?', [commentId]);
 
-      res.json({ message: '评论已删除' });
+      res.json({ message: req.__('messages.commentDeleted') });
     } catch (err) {
-      console.error('删除评论错误:', err);
-      res.status(500).json({ error: '删除失败' });
+      console.error('Delete comment error:', err);
+      res.status(500).json({ error: req.__('errors.deleteFailed') });
     }
   });
 
@@ -173,8 +173,8 @@ module.exports = (db) => {
         totalPages: Math.ceil(total / pageSize)
       });
     } catch (err) {
-      console.error('获取所有评论错误:', err);
-      res.status(500).json({ error: '获取评论列表失败' });
+      console.error('Get all comments error:', err);
+      res.status(500).json({ error: req.__('errors.fetchCommentsFailed') });
     }
   });
 
@@ -184,7 +184,7 @@ module.exports = (db) => {
       const { commentIds } = req.body;
       
       if (!commentIds || !Array.isArray(commentIds) || commentIds.length === 0) {
-        return res.status(400).json({ error: '请选择要删除的评论' });
+        return res.status(400).json({ error: req.__('errors.selectCommentsToDelete') });
       }
 
       // 使用参数化查询避免SQL注入
@@ -194,10 +194,10 @@ module.exports = (db) => {
         commentIds
       );
 
-      res.json({ message: `成功删除 ${commentIds.length} 条评论` });
+      res.json({ message: req.__('messages.batchDeleteSuccess', commentIds.length) });
     } catch (err) {
-      console.error('批量删除评论错误:', err);
-      res.status(500).json({ error: '批量删除失败' });
+      console.error('Batch delete comments error:', err);
+      res.status(500).json({ error: req.__('errors.batchDeleteFailed') });
     }
   });
 

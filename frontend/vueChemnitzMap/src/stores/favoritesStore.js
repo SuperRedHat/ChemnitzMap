@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { http } from '@/api';
 import { ElMessage } from 'element-plus';
 import { useAuthStore } from './authStore';
+import i18n from '@/locales';
 
 export const useFavoritesStore = defineStore('favorites', {
   state: () => ({
@@ -28,7 +29,7 @@ export const useFavoritesStore = defineStore('favorites', {
         this.favorites = response.data;
         this.favoriteSiteIds = new Set(response.data.map(f => f.id));
       } catch (error) {
-        console.error('获取收藏列表失败:', error);
+        console.error('Failed to fetch favorites:', error);
       } finally {
         this.loading = false;
       }
@@ -38,19 +39,19 @@ export const useFavoritesStore = defineStore('favorites', {
     async addFavorite(siteId) {
       const authStore = useAuthStore();
       if (!authStore.isAuthenticated) {
-        ElMessage.warning('请先登录');
+        ElMessage.warning(i18n.global.t('messages.loginFirst'));
         return { success: false, needLogin: true };
       }
 
       try {
         await http.post(`/favorites/${siteId}`);
         this.favoriteSiteIds.add(siteId);
-        ElMessage.success('收藏成功');
+        ElMessage.success(i18n.global.t('messages.favoriteSuccess'));
         // 重新获取收藏列表
         this.fetchFavorites();
         return { success: true };
       } catch (error) {
-        const message = error.response?.data?.error || '收藏失败';
+        const message = error.response?.data?.error || i18n.global.t('messages.favoriteFailed');
         ElMessage.error(message);
         return { success: false, error: message };
       }
@@ -62,10 +63,10 @@ export const useFavoritesStore = defineStore('favorites', {
         await http.delete(`/favorites/${siteId}`);
         this.favoriteSiteIds.delete(siteId);
         this.favorites = this.favorites.filter(f => f.id !== siteId);
-        ElMessage.success('已取消收藏');
+        ElMessage.success(i18n.global.t('messages.unfavoriteSuccess'));
         return { success: true };
       } catch (error) {
-        const message = error.response?.data?.error || '取消收藏失败';
+        const message = error.response?.data?.error || i18n.global.t('messages.unfavoriteFailed');
         ElMessage.error(message);
         return { success: false, error: message };
       }
@@ -95,7 +96,7 @@ export const useFavoritesStore = defineStore('favorites', {
         }
         return isFavorited;
       } catch (error) {
-        console.error('检查收藏状态失败:', error);
+        console.error('Failed to check favorite status:', error);
         return false;
       }
     },

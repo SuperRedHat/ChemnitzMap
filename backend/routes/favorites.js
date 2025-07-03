@@ -22,8 +22,8 @@ module.exports = (db) => {
 
       res.json(favorites);
     } catch (err) {
-      console.error('获取收藏列表错误:', err);
-      res.status(500).json({ error: '获取收藏列表失败' });
+      console.error('Get favorites error:', err);
+      res.status(500).json({ error: req.__('errors.fetchFavoritesFailed') });
     }
   });
 
@@ -39,7 +39,7 @@ module.exports = (db) => {
         [siteId]
       );
       if (sites.length === 0) {
-        return res.status(404).json({ error: '地点不存在' });
+        return res.status(404).json({ error: req.__('errors.siteNotFound') });
       }
 
       // 检查是否已收藏
@@ -48,7 +48,7 @@ module.exports = (db) => {
         [userId, siteId]
       );
       if (existing.length > 0) {
-        return res.status(400).json({ error: '已经收藏过该地点' });
+        return res.status(400).json({ error: req.__('errors.alreadyFavorited') });
       }
 
       // 添加收藏
@@ -57,10 +57,10 @@ module.exports = (db) => {
         [userId, siteId]
       );
 
-      res.status(201).json({ message: '收藏成功' });
+      res.status(201).json({ message: req.__('messages.favoriteSuccess') });
     } catch (err) {
-      console.error('添加收藏错误:', err);
-      res.status(500).json({ error: '添加收藏失败' });
+      console.error('Add favorite error:', err);
+      res.status(500).json({ error: req.__('errors.addFavoriteFailed') });
     }
   });
 
@@ -76,13 +76,13 @@ module.exports = (db) => {
       );
 
       if (result.affectedRows === 0) {
-        return res.status(404).json({ error: '未找到该收藏记录' });
+        return res.status(404).json({ error: req.__('errors.favoriteNotFound') });
       }
 
-      res.json({ message: '取消收藏成功' });
+      res.json({ message: req.__('messages.unfavoriteSuccess') });
     } catch (err) {
-      console.error('取消收藏错误:', err);
-      res.status(500).json({ error: '取消收藏失败' });
+      console.error('Remove favorite error:', err);
+      res.status(500).json({ error: req.__('errors.removeFavoriteFailed') });
     }
   });
 
@@ -99,8 +99,8 @@ module.exports = (db) => {
 
       res.json({ isFavorited: favorites.length > 0 });
     } catch (err) {
-      console.error('检查收藏状态错误:', err);
-      res.status(500).json({ error: '检查收藏状态失败' });
+      console.error('Check favorite status error:', err);
+      res.status(500).json({ error: req.__('errors.checkFavoriteStatusFailed') });
     }
   });
 

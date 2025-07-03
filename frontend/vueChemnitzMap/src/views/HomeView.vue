@@ -16,7 +16,7 @@
           :class="{ active: dataStore.filter.tenMinuteMode }"
           class="special-mode"
         >
-          🚌 10分钟可达
+          🚌 {{ $t('map.tenMinute') }}
         </li>
         <li
           v-for="cat in dataStore.categories"
@@ -47,13 +47,13 @@
           @change="onRadiusChange"
         />
         <div v-if="dataStore.filter.category" class="current-category">
-         {{ $t('map.nearbyCategory') }}: <strong>{{ dataStore.filter.category }}</strong>
+          {{ $t('map.nearbyCategory') }}: <strong>{{ dataStore.filter.category }}</strong>
         </div>
       </div>
 
       <!-- 10分钟城市模式控制 -->
       <div v-if="dataStore.filter.tenMinuteMode" class="mode-controls ten-minute-controls">
-        <h4>出行时间: {{ travelTime }} 分钟</h4>
+        <h4>{{ $t('map.travelTime', { time: travelTime }) }}</h4>
         <el-slider 
           v-model="travelTime" 
           :min="5" 
@@ -63,9 +63,9 @@
           @change="onTravelTimeChange"
         />
         <div class="transport-info">
-          <p>🚶 步行时间: {{ dataStore.filter.walkingTime }}分钟</p>
-          <p>🚌 公交时间: {{ Math.max(0, travelTime - dataStore.filter.walkingTime) }}分钟</p>
-          <p>📍 可达范围: {{ (reachableDistance / 1000).toFixed(1) }}公里</p>
+          <p>🚶 {{ $t('map.transportInfo.walking', { time: dataStore.filter.walkingTime }) }}</p>
+          <p>🚌 {{ $t('map.transportInfo.transit', { time: Math.max(0, travelTime - dataStore.filter.walkingTime) }) }}</p>
+          <p>📍 {{ $t('map.transportInfo.reachable', { distance: (reachableDistance / 1000).toFixed(1) }) }}</p>
         </div>
       </div>
       
@@ -73,11 +73,11 @@
       <input
         type="text"
         v-model="search"
-        placeholder="Search..."
+        :placeholder="$t('map.search')"
         @keyup.enter="onSearch"
         :disabled="isSpecialMode"
       />
-      <button @click="onSearch" :disabled="isSpecialMode">Search</button>
+      <button @click="onSearch" :disabled="isSpecialMode">{{ $t('map.searchButton') }}</button>
     </aside>
 
     <!-- 右侧内容区 -->
@@ -88,10 +88,10 @@
       <!-- 结果列表 -->
       <div class="results-section">
         <div class="results-header">
-          <h3>文化地点列表 ({{ dataStore.sites.length }} 个结果)</h3>
+          <h3>{{ $t('map.results', { count: dataStore.sites.length }) }}</h3>
         </div>
         
-        <div v-if="dataStore.loading" class="loading">Loading...</div>
+        <div v-if="dataStore.loading" class="loading">{{ $t('map.loading') }}</div>
         <div v-else-if="dataStore.error" class="error">{{ dataStore.error }}</div>
         
         <ul v-else class="site-list">
@@ -148,7 +148,9 @@ import { useFootprintsStore } from '@/stores/footprintsStore';
 import { http } from '@/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const footprintsStore = useFootprintsStore();
 
 // 处理收集地点
@@ -157,7 +159,7 @@ const handleCollect = async (siteId, siteName) => {
     console.log('开始收集地点:', siteId, siteName); // 调试信息
     
     if (!userLocation.value) {
-      ElMessage.warning('请先获取当前位置');
+      ElMessage.warning(t('messages.locationRequired'));
       return;
     }
     
@@ -223,20 +225,20 @@ const reachableDistance = computed(() =>
 );
 
 // 标记配置
-const radiusMarks = {
-  500: '500m',
-  1000: '1km',
-  2000: '2km',
-  5000: '5km'
-};
+const radiusMarks = computed(() => ({
+  500: t('map.radiusMarks.500m'),
+  1000: t('map.radiusMarks.1km'),
+  2000: t('map.radiusMarks.2km'),
+  5000: t('map.radiusMarks.5km')
+}));
 
-const timeMarks = {
-  5: '5分钟',
-  10: '10分钟',
-  15: '15分钟',
-  20: '20分钟',
-  30: '30分钟'
-};
+const timeMarks = computed(() => ({
+  5: t('map.timeMarks.5min'),
+  10: t('map.timeMarks.10min'),
+  15: t('map.timeMarks.15min'),
+  20: t('map.timeMarks.20min'),
+  30: t('map.timeMarks.30min')
+}));
 
 // 创建彩色图标
 const createColoredIcon = (hexColor) => {
@@ -296,7 +298,7 @@ const initMap = async () => {
       onAdd: function() {
         const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
         container.innerHTML = '📍';
-        container.title = '获取当前位置';
+        container.title = t('map.getLocation');
         container.style.width = '34px';
         container.style.height = '34px';
         container.style.lineHeight = '30px';
@@ -332,7 +334,7 @@ const addLegend = () => {
     div.style.boxShadow = '0 0 15px rgba(0,0,0,0.2)';
     
     const categories = dataStore.categories;
-    let html = '<h4 style="margin: 0 0 5px 0">文化地点类别</h4>';
+    let html = `<h4 style="margin: 0 0 5px 0">${t('map.legend.title')}</h4>`;
     
     const iconMap = {
       'Theatre': '🎭',
@@ -360,7 +362,7 @@ const addLegend = () => {
 // 获取当前位置
 const getCurrentLocation = () => {
   if (!navigator.geolocation) {
-    ElMessage.warning('浏览器不支持定位功能');
+    ElMessage.warning(t('map.locationNotSupported'));
     return;
   }
   
@@ -417,7 +419,7 @@ const updateUserMarker = () => {
       zIndexOffset: 1000 // 确保用户标记在最上层
     })
     .addTo(map)
-    .bindPopup('您在这里');
+    .bindPopup(t('map.legend.youAreHere'));
   }
 };
 
@@ -474,9 +476,9 @@ const createPopupContent = (site, isFavorited) => {
   return `
     <div style="padding: 5px;">
       <h4 style="margin: 0 0 8px 0; color: ${site.color}">${site.name}</h4>
-      <p style="margin: 4px 0;"><strong>类别:</strong> ${site.category}</p>
-      ${site.address ? `<p style="margin: 4px 0;"><strong>地址:</strong> ${site.address}</p>` : ''}
-      ${distance !== null ? `<p style="margin: 4px 0;"><strong>距离:</strong> ${distance}米</p>` : ''}
+      <p style="margin: 4px 0;"><strong>${t('map.popup.category')}:</strong> ${site.category}</p>
+      ${site.address ? `<p style="margin: 4px 0;"><strong>${t('map.popup.address')}:</strong> ${site.address}</p>` : ''}
+      ${distance !== null ? `<p style="margin: 4px 0;"><strong>${t('map.popup.distance')}:</strong> ${t('map.popup.meters', { distance })}</p>` : ''}
       <p style="margin: 8px 0; font-size: 0.9em;">${site.description || ''}</p>
       
       <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
@@ -491,24 +493,24 @@ const createPopupContent = (site, isFavorited) => {
               style="padding: 6px 12px; margin: 0 4px; background: ${canCollect ? '#67c23a' : '#909399'}; 
               color: white; border: none; border-radius: 4px; cursor: ${canCollect ? 'pointer' : 'not-allowed'};"
               ${!canCollect ? 'disabled' : ''}>
-              ${canCollect ? '🎯 收集' : '🚫 太远了'}
+              ${canCollect ? `🎯 ${t('map.popup.collect')}` : `🚫 ${t('map.popup.tooFar')}`}
             </button>
           ` : `
             <div style="padding: 6px 12px; margin: 0 4px; background: #e6f7ff; 
               border: 1px solid #91d5ff; border-radius: 4px; color: #1890ff;">
-              ✅ 已收集
+              ✅ ${t('map.popup.collected')}
             </div>
           `}
           <button onclick="window.handleMapFavorite(${site.id})" 
             style="padding: 6px 12px; margin: 0 4px; background: ${isFavorited ? '#ffc107' : '#f0f0f0'}; 
             border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
-            ${isFavorited ? '★ 已收藏' : '☆ 收藏'}
+            ${isFavorited ? `★ ${t('map.popup.favorited')}` : `☆ ${t('map.popup.favorite')}`}
           </button>
         ` : ''}
         <button onclick="window.handleMapViewDetails(${site.id})" 
           style="padding: 6px 12px; margin: 0 4px; background: #409eff; color: white; 
           border: none; border-radius: 4px; cursor: pointer;">
-          查看详情
+          ${t('map.popup.viewDetails')}
         </button>
       </div>
     </div>
@@ -521,7 +523,7 @@ const handleCategoryClick = (category) => {
     dataStore.filter.category = category;
     dataStore.applyFilter();
   } else if (dataStore.filter.tenMinuteMode) {
-    ElMessage.warning('请先退出10分钟城市模式');
+    ElMessage.warning(t('map.exitMode', { mode: t('map.tenMinute') }));
   } else {
     search.value = '';
     dataStore.setQuery('');
@@ -562,13 +564,13 @@ const startNearbyMode = () => {
         clearInterval(checkLocation);
         dataStore.setNearbyMode(true, userLocation.value);
         drawRangeCircle(nearbyRadius.value, '#FF8C00');
-        ElMessage.success(`已开启 Nearby 模式，扫描半径 ${nearbyRadius.value} 米`);
+        ElMessage.success(t('messages.nearbyModeOn', { radius: nearbyRadius.value }));
       }
     }, 100);
   } else {
     dataStore.setNearbyMode(true, userLocation.value);
     drawRangeCircle(nearbyRadius.value, '#FF8C00');
-    ElMessage.success(`已开启 Nearby 模式，扫描半径 ${nearbyRadius.value} 米`);
+    ElMessage.success(t('messages.nearbyModeOn', { radius: nearbyRadius.value }));
   }
 };
 
@@ -603,13 +605,13 @@ const startTenMinuteMode = () => {
         clearInterval(checkLocation);
         dataStore.setTenMinuteMode(true, userLocation.value);
         drawRangeCircle(reachableDistance.value, '#1E90FF');
-        ElMessage.success(`已开启10分钟城市模式，可达范围 ${(reachableDistance.value / 1000).toFixed(1)} 公里`);
+        ElMessage.success(t('messages.tenMinuteModeOn', { distance: (reachableDistance.value / 1000).toFixed(1) }));
       }
     }, 100);
   } else {
     dataStore.setTenMinuteMode(true, userLocation.value);
     drawRangeCircle(reachableDistance.value, '#1E90FF');
-    ElMessage.success(`已开启10分钟城市模式，可达范围 ${(reachableDistance.value / 1000).toFixed(1)} 公里`);
+    ElMessage.success(t('messages.tenMinuteModeOn', { distance: (reachableDistance.value / 1000).toFixed(1) }));
   }
 };
 
@@ -651,7 +653,7 @@ const onRadiusChange = (value) => {
   dataStore.setNearbyRadius(value);
   if (rangeCircle) {
     rangeCircle.setRadius(value);
-    ElMessage.success(`扫描半径已更新为 ${value} 米`);
+    ElMessage.success(t('messages.radiusUpdated', { radius: value }));
   }
 };
 
@@ -660,7 +662,10 @@ const onTravelTimeChange = (value) => {
   dataStore.setMaxTravelTime(value);
   if (rangeCircle) {
     drawRangeCircle(reachableDistance.value, '#1E90FF');
-    ElMessage.success(`出行时间已更新为 ${value} 分钟，可达范围 ${(reachableDistance.value / 1000).toFixed(1)} 公里`);
+    ElMessage.success(t('messages.travelTimeUpdated', { 
+      time: value, 
+      distance: (reachableDistance.value / 1000).toFixed(1) 
+    }));
   }
 };
 
