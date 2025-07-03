@@ -105,3 +105,8 @@ export function checkFootprintStatus(siteId) {
 export function deleteFootprint(siteId) {
   return http.delete(`/footprints/${siteId}`).then(res => res.data);
 }
+
+// 获取统计数据
+export function fetchStats() {
+  return http.get('/stats/summary').then(res => res.data);
+}

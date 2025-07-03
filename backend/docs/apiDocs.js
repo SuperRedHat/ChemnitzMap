@@ -32,12 +32,18 @@
  *     description: User collection records
  *   - name: Comments
  *     description: Site reviews and ratings
+ *   - name: Statistics
+ *     description: System statistics and analytics
  */
+
+
+
 
 /**
  * @swagger
  * components:
  *   schemas:
+ * 
  *     User:
  *       type: object
  *       properties:
@@ -262,6 +268,30 @@
  *         message:
  *           type: string
  *           description: Success message
+ * 
+ *     Statistics:
+ *       type: object
+ *       properties:
+ *         siteCount:
+ *           type: integer
+ *           description: Total number of cultural sites
+ *         userCount:
+ *           type: integer
+ *           description: Total number of active users
+ *         categoryCount:
+ *           type: integer
+ *           description: Number of categories
+ *         categoryStats:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 description: Category name
+ *               count:
+ *                 type: integer
+ *                 description: Number of sites in this category
  */
 
 /**
@@ -995,5 +1025,6 @@
  *       403:
  *         description: Admin permission required
  */
+
 
 module.exports = {};

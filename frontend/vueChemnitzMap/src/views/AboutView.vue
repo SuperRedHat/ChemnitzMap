@@ -22,7 +22,7 @@
             <div class="stats-row">
               <el-statistic 
                 :title="$t('about.stats.sites')" 
-                :value="siteCount" 
+                :value="loading ? '...' : siteCount" 
                 class="stat-item"
               >
                 <template #prefix>
@@ -40,13 +40,27 @@
               </el-statistic>
               <el-statistic 
                 :title="$t('about.stats.users')" 
-                :value="userCount" 
+                :value="loading ? '...' : userCount" 
                 class="stat-item"
               >
                 <template #prefix>
                   <el-icon><User /></el-icon>
                 </template>
               </el-statistic>
+            </div>
+            <div v-if="!loading && categoryStats.length > 0" class="category-stats">
+              <h4>{{ $t('about.stats.categoryDistribution') }}</h4>
+              <el-row :gutter="20">
+                <el-col :span="6" v-for="stat in categoryStats" :key="stat.category">
+                  <div class="category-stat-item">
+                    <div class="category-icon">
+                      {{ getCategoryIcon(stat.category) }}
+                    </div>
+                    <div class="category-name">{{ stat.category }}</div>
+                    <div class="category-count">{{ stat.count }}</div>
+                  </div>
+                </el-col>
+              </el-row>
             </div>
           </el-card>
         </section>
@@ -242,23 +256,37 @@ import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { 
   InfoFilled, Location, Grid, User, Position, Van, 
-  DataAnalysis, Cpu, Message, Link, Picture
+  DataAnalysis, Cpu, Message, Link, Picture, Search
 } from '@element-plus/icons-vue';
 import config from '@/config';
+import { fetchStats } from '@/api';  // 添加导入
 
 const { t } = useI18n();
+const categoryStats = ref([]);
+
+// 添加获取类别图标的方法
+const getCategoryIcon = (category) => {
+  const iconMap = {
+    'Theatre': '🎭',
+    'Museum': '🏛️',
+    'Public Art': '🎨',
+    'Restaurant': '🍽️'
+  };
+  return iconMap[category] || '📍';
+};
 
 // 数据
 const siteCount = ref(0);
 const userCount = ref(0);
+const loading = ref(true);  // 添加加载状态
 const activeFaq = ref([]);
 
 // 功能特性
 const features = [
-  { key: 'mapBrowsing', icon: 'Location', color: '#409EFF' },
-  { key: 'searchFilter', icon: 'Search', color: '#67C23A' },
-  { key: 'userFeatures', icon: 'User', color: '#E6A23C' },
-  { key: 'specialModes', icon: 'Position', color: '#F56C6C' }
+  { key: 'mapBrowsing', icon: Location, color: '#409EFF' },
+  { key: 'searchFilter', icon: Search, color: '#67C23A' },  
+  { key: 'userFeatures', icon: User, color: '#E6A23C' },
+  { key: 'specialModes', icon: Position, color: '#F56C6C' }
 ];
 
 // 技术栈
@@ -282,17 +310,62 @@ const openGithub = () => {
   window.open('https://github.com/SuperRedHat/ChemnitzMap/', '_blank');
 };
 
-// 模拟获取统计数据
-onMounted(() => {
-  // 这里可以调用API获取真实数据
-  setTimeout(() => {
-    siteCount.value = 238;
-    userCount.value = 156;
-  }, 1000);
+
+
+// 获取真实的统计数据
+onMounted(async () => {
+  try {
+    loading.value = true;
+    const stats = await fetchStats();
+    siteCount.value = stats.siteCount;
+    userCount.value = stats.userCount;
+    categoryStats.value = stats.categoryStats || [];
+  } catch (error) {
+    console.error('Failed to fetch statistics:', error);
+    siteCount.value = 0;
+    userCount.value = 0;
+  } finally {
+    loading.value = false;
+  }
 });
+
 </script>
 
 <style scoped>
+.category-stats {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+.category-stats h4 {
+  margin: 0 0 20px 0;
+  text-align: center;
+  color: #303133;
+}
+
+.category-stat-item {
+  text-align: center;
+}
+
+.category-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.category-name {
+  font-weight: 500;
+  color: #606266;
+  margin-bottom: 5px;
+}
+
+.category-count {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #303133;
+}
+
 .about-container {
   min-height: 100vh;
   background: #f5f7fa;
@@ -300,10 +373,17 @@ onMounted(() => {
 
 /* Hero Section */
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-image: url('@/assets/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: white;
   padding: 60px 20px;
   text-align: center;
+  position: relative;
+  /* 添加最小高度确保内容显示 */
+  min-height: 300px;
 }
 
 .hero-title {

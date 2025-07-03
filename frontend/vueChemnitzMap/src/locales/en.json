@@ -357,7 +357,8 @@
     "stats": {
       "sites": "Cultural Sites",
       "categories": "Categories",
-      "users": "Registered Users"
+      "users": "Registered Users",
+      "categoryDistribution": "Distribution by Category"
     },
     "faq": {
       "title": "Frequently Asked Questions",
