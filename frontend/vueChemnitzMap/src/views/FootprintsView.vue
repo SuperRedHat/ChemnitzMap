@@ -469,11 +469,12 @@ watch(viewMode, async (newMode) => {
 /* 主容器调整 */
 .footprints-container {
   padding: 20px;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  height: calc(100vh - 100px); /* 调整整体高度 */
+  height: calc(100vh - 100px); /* 确保有固定高度 */
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* 防止整体滚动 */
 }
 
 /* el-card 调整 */
@@ -487,10 +488,8 @@ watch(viewMode, async (newMode) => {
 /* el-card__body 调整 */
 .footprints-container .el-card :deep(.el-card__body) {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding-bottom: 0;
+  overflow-y: auto;
+  padding: 20px;
 }
 
 .footprints-container {
@@ -721,5 +720,110 @@ watch(viewMode, async (newMode) => {
     width: 100%;
     margin-left: 0 !important;
   }
+
+  .footprints-container ::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .footprints-container ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .footprints-container ::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 2px;
+  }
+
+  .footprints-container {
+    padding: 10px;
+    height: calc(100vh - 80px); /* 移动设备调整高度 */
+  }
+  
+  .footprints-container .el-card {
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+  
+  .footprints-container .el-card :deep(.el-card__body) {
+    padding: 15px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
+  }
+  
+  .footprints-container .el-card :deep(.el-card__header) {
+    padding: 15px;
+    border-bottom: 1px solid #ebeef5;
+    flex-shrink: 0; /* 防止头部被压缩 */
+  }
+  
+  /* 如果有网格布局，改为单列 */
+  .footprints-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+  }
+  
+  /* 统计信息在移动设备上的布局优化 */
+  .stats-overview {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .stats-item {
+    text-align: center;
+  }
+  
+  /* 足迹卡片在移动设备上的优化 */
+  .footprint-card {
+    margin-bottom: 15px;
+  }
+  
+  .footprint-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .footprint-actions .el-button {
+    width: 100%;
+    margin-left: 0 !important;
+  }
 }
+
+/* 优化滚动条样式 */
+.footprints-container ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.footprints-container ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.footprints-container ::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.footprints-container ::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 移动设备滚动条优化 */
+@media (max-width: 768px) {
+  .footprints-container ::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .footprints-container ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .footprints-container ::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 2px;
+  }
+}
+
 </style>
