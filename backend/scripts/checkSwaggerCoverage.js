@@ -4,13 +4,14 @@ const path = require('path');
 // 读取所有路由文件
 const routesDir = path.join(__dirname, '../routes');
 const docsDir = path.join(__dirname, '../docs');
+const indexFile = path.join(__dirname, '../index.js');
 
 // 标准化路径（移除末尾的斜杠）
 function normalizePath(path) {
   return path.replace(/\/$/, '');
 }
 
-// 提取所有路由定义
+// 提取路由文件中的路由定义
 function extractRoutes(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const routes = [];
@@ -24,6 +25,33 @@ function extractRoutes(filePath) {
       method: match[1].toUpperCase(),
       path: normalizePath(match[2]),
       file: path.basename(filePath)
+    });
+  }
+  
+  return routes;
+}
+
+// 提取index.js中的直接路由定义
+function extractIndexRoutes(filePath) {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const routes = [];
+  
+  // 匹配 app.get, app.post 等直接定义在app上的路由
+  const appRouteRegex = /app\.(get|post|put|delete|patch)\s*\(\s*['"`]([^'"`]+)['"`]/g;
+  let match;
+  
+  while ((match = appRouteRegex.exec(content)) !== null) {
+    let routePath = match[2];
+    // 移除 /api 前缀来匹配其他路由的格式
+    if (routePath.startsWith('/api')) {
+      routePath = routePath.substring(4);
+    }
+    
+    routes.push({
+      method: match[1].toUpperCase(),
+      path: normalizePath(routePath),
+      file: 'index.js',
+      fullPath: normalizePath(match[2]) // 保留完整路径用于文档匹配
     });
   }
   
@@ -48,7 +76,7 @@ function extractSwaggerDocs(filePath) {
 
 // 生成基础 Swagger 文档
 function generateSwaggerDoc(route, basePath) {
-  const fullPath = `${basePath}${route.path}`;
+  const fullPath = route.fullPath || `${basePath}${route.path}`;
   const tag = route.file.replace('.js', '').charAt(0).toUpperCase() + route.file.replace('.js', '').slice(1);
   
   let template = `/**
@@ -95,6 +123,8 @@ function generateSwaggerDoc(route, basePath) {
 function checkAndGenerateDocs() {
   // 获取所有路由
   const allRoutes = [];
+  
+  // 1. 扫描routes目录下的路由文件
   const routeFiles = fs.readdirSync(routesDir).filter(file => file.endsWith('.js'));
   
   routeFiles.forEach(file => {
@@ -108,6 +138,12 @@ function checkAndGenerateDocs() {
     });
   });
 
+  // 2. 扫描index.js中的直接路由
+  if (fs.existsSync(indexFile)) {
+    const indexRoutes = extractIndexRoutes(indexFile);
+    allRoutes.push(...indexRoutes);
+  }
+
   // 获取所有文档化的路径
   const documentedPaths = new Set();
   
@@ -120,11 +156,17 @@ function checkAndGenerateDocs() {
   // 从文档文件中提取
   if (fs.existsSync(docsDir)) {
     fs.readdirSync(docsDir).forEach(file => {
-      if (file.endsWith('.js')) {
+      if (file.endsWith('.js') && !file.includes('generated')) {
         const docs = extractSwaggerDocs(path.join(docsDir, file));
         docs.forEach(doc => documentedPaths.add(doc));
       }
     });
+  }
+
+  // 从index.js中提取
+  if (fs.existsSync(indexFile)) {
+    const docs = extractSwaggerDocs(indexFile);
+    docs.forEach(doc => documentedPaths.add(doc));
   }
 
   // 检查未文档化的路由
@@ -132,10 +174,11 @@ function checkAndGenerateDocs() {
 
   const undocumented = [];
   allRoutes.forEach(route => {
+    const checkPath = route.fullPath || normalizePath(`${route.basePath}${route.path}`);
     const hasDoc = Array.from(documentedPaths).some(doc => {
       // 处理参数化路径
       const docPattern = doc.replace(/\{(\w+)\}/g, ':$1');
-      return normalizePath(docPattern) === normalizePath(route.fullPath);
+      return normalizePath(docPattern) === normalizePath(checkPath);
     });
     
     if (!hasDoc) {
@@ -143,18 +186,26 @@ function checkAndGenerateDocs() {
     }
   });
 
+  // 输出详细的路由列表（调试用）
+  console.log('📋 Detected Routes:');
+  allRoutes.forEach((route, index) => {
+    const fullPath = route.fullPath || `${route.basePath}${route.path}`;
+    console.log(`   ${index + 1}. ${route.method} ${fullPath} (${route.file})`);
+  });
+  console.log();
+
   if (undocumented.length === 0) {
     console.log('✅ All routes are documented!');
   } else {
     console.log(`❌ Found ${undocumented.length} undocumented routes:\n`);
     undocumented.forEach(route => {
-      console.log(`   ${route.method} ${route.fullPath} (in ${route.file})`);
+      const fullPath = route.fullPath || `${route.basePath}${route.path}`;
+      console.log(`   ${route.method} ${fullPath} (in ${route.file})`);
     });
     
-    // 询问是否生成文档
+    // 生成文档模板
     console.log('\n📝 Generating documentation templates...\n');
     
-    // 生成文档模板
     const templates = undocumented.map(route => ({
       route,
       doc: generateSwaggerDoc(route, route.basePath)
@@ -165,7 +216,8 @@ function checkAndGenerateDocs() {
     let content = '/**\n * Auto-generated Swagger documentation templates\n * Copy these to your apiDocs.js file and customize as needed\n */\n\n';
     
     templates.forEach(({ route, doc }) => {
-      content += `// ${route.method} ${route.fullPath}\n${doc}\n`;
+      const fullPath = route.fullPath || `${route.basePath}${route.path}`;
+      content += `// ${route.method} ${fullPath}\n${doc}\n`;
     });
     
     fs.writeFileSync(outputPath, content);

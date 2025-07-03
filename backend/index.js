@@ -51,7 +51,25 @@ async function createApp() {
   // Swagger UI 路由 - 放在 API 路由之前
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-  // 健康检查
+  /**
+   * @swagger
+   * /health:
+   *   get:
+   *     summary: Health check endpoint
+   *     description: Check if the API service is running
+   *     tags: [System]
+   *     responses:
+   *       200:
+   *         description: Service is healthy
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                   example: ok
+   */
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
   // 装载路由，并把 db 传进去

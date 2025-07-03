@@ -3,13 +3,13 @@
  * Copy these to your apiDocs.js file and customize as needed
  */
 
-// GET /stats/summary
+// GET /api/health
 /**
  * @swagger
- * /stats/summary:
+ * /api/health:
  *   get:
- *     summary: GET /stats/summary
- *     tags: [Stats]
+ *     summary: GET /api/health
+ *     tags: [Index]
  *     security:
  *       - bearerAuth: []
  *     responses:

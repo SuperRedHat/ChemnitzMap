@@ -62,10 +62,19 @@ const options = {
       {
         name: 'Comments',
         description: 'Site reviews and ratings'
+      },
+      {
+        name: 'Statistics',
+        description: 'System statistics and analytics'
+      },
+      {
+        name: 'System',
+        description: 'System status and health checks'
       }
     ]
   },
-  apis: ['./routes/*.js', './docs/*.js'],
+  // 只扫描路由文件和主文档文件，排除生成的模板
+  apis: ['./routes/*.js', './docs/apiDocs.js'],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
