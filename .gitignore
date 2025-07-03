@@ -1,0 +1,41 @@
+# 依赖文件 - 匹配所有子目录
+**/node_modules/
+**/package-lock.json
+
+# 环境变量文件
+**/.env
+**/.env.*
+!**/.env.example
+
+# 构建输出
+**/dist/
+**/build/
+
+# 日志文件
+**/*.log
+**/logs/
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+.DS_Store?
+*.swp
+*.swo
+
+# IDE 文件
+.vscode/
+.idea/
+*.sublime-*
+
+# 临时文件
+**/*.tmp
+**/*.temp
+
+# 测试覆盖率
+**/coverage/
+
+
+# NPM 相关
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
