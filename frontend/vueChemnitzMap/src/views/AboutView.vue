@@ -500,4 +500,22 @@ section {
     flex-direction: column;
   }
 }
+
+.about-container {
+  min-height: 100vh;
+  background: #f5f7fa;
+  /* 添加以下样式来确保可以滚动 */
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 为了确保内容不会被底部遮挡，添加底部内边距 */
+.content-wrapper {
+  max-width: 1200px;
+  margin: -40px auto 0;
+  padding: 0 20px 40px;
+  /* 添加最小高度，确保内容可以滚动 */
+  min-height: calc(100vh - 100px);
+}
 </style>

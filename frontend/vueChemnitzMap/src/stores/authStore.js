@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia';
 import { http } from '@/api';
 import { ElMessage } from 'element-plus';
+import i18n from '@/locales';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -33,7 +34,7 @@ export const useAuthStore = defineStore('auth', {
         const response = await http.post('/users/register', userData);
         const { user, token } = response.data;
         this.setAuth(user, token);
-        ElMessage.success('注册成功！');
+        ElMessage.success(i18n.global.t('messages.registerSuccess'));
         return { success: true };
       } catch (error) {
         const message = error.response?.data?.error || '注册失败';
@@ -48,7 +49,7 @@ export const useAuthStore = defineStore('auth', {
         const response = await http.post('/users/login', credentials);
         const { user, token } = response.data;
         this.setAuth(user, token);
-        ElMessage.success('登录成功！');
+        ElMessage.success(i18n.global.t('messages.loginSuccess'));
         return { success: true };
       } catch (error) {
         const message = error.response?.data?.error || '登录失败';
@@ -77,7 +78,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const response = await http.put('/users/me', data);
         this.user = response.data.user;
-        ElMessage.success('更新成功！');
+        ElMessage.success(i18n.global.t('messages.updateSuccess'));
         return { success: true };
       } catch (error) {
         const message = error.response?.data?.error || '更新失败';
@@ -93,7 +94,7 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = false;
       localStorage.removeItem('token');
       delete http.defaults.headers.common['Authorization'];
-      ElMessage.success('已退出登录');
+      ElMessage.success(i18n.global.t('messages.logoutSuccess'));
     }
   }
 });

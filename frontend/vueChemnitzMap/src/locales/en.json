@@ -28,7 +28,14 @@
     "walkingTime": "Walking: {time} min",
     "transitTime": "Transit: {time} min",
     "reachableRange": "Reachable: {distance} km",
-    "currentCategory": "Current Category"
+    "currentCategory": "Current Category",
+    "nearbyRadius": "Scan Radius: {radius} meters",
+    "nearbyCategory": "Current Category",
+    "transportInfo": {
+      "walking": "Walking: {time} minutes",
+      "transit": "Transit: {time} minutes", 
+      "reachable": "Reachable: {distance} km"
+    }
   },
   "site": {
     "category": "Category",
@@ -43,7 +50,17 @@
     "favorite": "Favorite",
     "favorited": "Favorited",
     "viewDetails": "View Details",
-    "back": "Back"
+    "back": "Back",
+    "osmId": "OSM ID",
+    "meters": "{distance} meters",
+    "theatreInfo": "Theatre Information",
+    "theatreDesc": "This is a performing arts venue where you can enjoy theater, concerts, dance performances and more.",
+    "museumInfo": "Museum Information",
+    "museumDesc": "Explore rich historical and cultural collections, learn about art, science and human civilization.",
+    "publicArtInfo": "Public Art Information",
+    "publicArtDesc": "This is an outdoor artwork showcasing the city's creativity and cultural vitality.",
+    "restaurantInfo": "Restaurant Information",
+    "restaurantDesc": "Taste delicious cuisine and experience local and international food culture."
   },
   "auth": {
     "username": "Username",
@@ -80,7 +97,8 @@
     "title": "Profile",
     "updatePassword": "Change Password",
     "saveChanges": "Save Changes",
-    "reset": "Reset"
+    "reset": "Reset",
+    "changePassword": "Change Password"
   },
   "favorites": {
     "title": "My Favorites",
@@ -88,7 +106,8 @@
     "empty": "No favorites yet",
     "addedAt": "Favorited at",
     "viewOnMap": "View on Map",
-    "remove": "Remove"
+    "remove": "Remove",
+    "removeConfirm": "Remove from favorites?"
   },
   "footprints": {
     "title": "My Footprints",
@@ -108,7 +127,8 @@
     "collectionDistance": "Collection distance",
     "cardView": "Card View",
     "mapView": "Map View",
-    "timeline": "Timeline"
+    "timeline": "Timeline",
+    "deleteConfirm": "Delete this footprint? (Test only)"
   },
   "comment": {
     "title": "User Reviews",
@@ -146,7 +166,30 @@
     "self": "Self",
     "deleteConfirm": "Are you sure to delete user \"{username}\"? This is a soft delete, the user will not be able to login.",
     "batchDelete": "Batch Delete ({count})",
-    "clearSelection": "Clear Selection"
+    "clearSelection": "Clear Selection",
+    "statistics": {
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users", 
+      "adminCount": "Admins",
+      "deletedUsers": "Deleted Users"
+    },
+    "table": {
+      "id": "ID",
+      "username": "Username",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "location": "Location",
+      "registeredAt": "Registered At",
+      "operations": "Operations"
+    },
+    "pageSize": "{size} items",
+    "totalPages": "Page {current} of {total}",
+    "site": "Site",
+    "rating": "Rating",
+    "content": "Content",
+    "commentTime": "Comment Time",
+    "commenter": "User"
   },
   "messages": {
     "welcome": "Welcome to Chemnitz Cultural Map",

@@ -51,8 +51,8 @@
                 <div class="icon-info">
                   <span class="icon">🎭</span>
                   <div>
-                    <h4>剧院信息</h4>
-                    <p>这是一个表演艺术场所，您可以在这里欣赏各种精彩的演出，包括戏剧、音乐会、舞蹈等。</p>
+                    <h4>{{ $t('site.theatreInfo') }}</h4>
+                    <p>{{ $t('site.theatreDesc') }}</p>
                   </div>
                 </div>
               </div>
@@ -229,6 +229,8 @@ import { useFavoritesStore } from '@/stores/favoritesStore';
 import { http } from '@/api';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 
 // 判断是否可以删除评论
 const canDeleteComment = (comment) => {

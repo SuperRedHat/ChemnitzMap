@@ -2,7 +2,7 @@
   <div class="register-container">
     <el-card class="register-card">
       <template #header>
-        <h2 class="register-title">注册新账号</h2>
+        <h2 class="register-title">{{ $t('auth.registerTitle') }}</h2>
       </template>
       
       <el-form 
@@ -65,8 +65,8 @@
         </el-form-item>
 
         <div class="register-footer">
-          <span>已有账号？</span>
-          <router-link to="/login" class="link">立即登录</router-link>
+          <span>{{ $t('auth.hasAccount') }}</span>
+          <router-link to="/login" class="link">{{ $t('auth.login') }}</router-link>
         </div>
       </el-form>
     </el-card>
