@@ -9,8 +9,9 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { setLanguage } from '@/locales';
 
-const { locale, t } = useI18n();
 
+const { locale, t } = useI18n();
+import chemnitzLogo from '@/assets/chemnitz_logo.png';
 // 计算当前语言名称
 const currentLanguageName = computed(() => {
   const langMap = {
@@ -69,7 +70,10 @@ const handleCommand = (command) => {
 <template>
   <div id="app">
     <header class="app-header">
-      <h1>{{ $t('app.title') }}</h1>
+      <div class="app-title">
+        <img :src="chemnitzLogo" alt="Chemnitz Logo" class="app-logo">
+        <h1>{{ $t('app.title') }}</h1>
+      </div>
       <nav>
         <router-link to="/">{{ $t('app.nav.map') }}</router-link>
         <router-link to="/about">{{ $t('app.nav.about') }}</router-link>
@@ -146,6 +150,18 @@ const handleCommand = (command) => {
 </template>
 
 <style scoped>
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-logo {
+  height: 40px;
+  width: auto;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
 /* 保持原有样式不变 */
 /* 语言切换过渡效果 */
 .language-transition {
@@ -183,13 +199,16 @@ const handleCommand = (command) => {
 }
 
 .app-header {
-  background: #42b883;
+  background: rgba(20, 30, 48, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: white;
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .app-header h1 {
@@ -256,6 +275,14 @@ const handleCommand = (command) => {
   .app-header {
     flex-direction: column;
     gap: 1rem;
+  }
+
+   .app-title {
+    gap: 0.5rem;
+  }
+  
+  .app-logo {
+    height: 32px;
   }
   
   .app-header h1 {

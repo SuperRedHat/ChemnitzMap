@@ -61,7 +61,7 @@ async function createApp() {
   app.use('/api/favorites',  require('./routes/favorites')(db));
   app.use('/api/footprints', require('./routes/footprints')(db));
   app.use('/api/comments',   require('./routes/comments')(db));
-
+  app.use('/api/stats', require('./routes/stats')(db));
   return app;
 }
 

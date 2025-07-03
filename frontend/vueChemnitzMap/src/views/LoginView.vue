@@ -100,19 +100,50 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
+.el-button--primary {
+  background: rgba(20, 30, 48, 0.9) !important;
+  border-color: rgba(20, 30, 48, 0.9) !important;
+  color: white !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.el-button--primary:hover {
+  background: rgba(30, 40, 60, 1) !important;
+  border-color: rgba(30, 40, 60, 1) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(20, 30, 48, 0.4);
+}
+
+.el-button--primary:active {
+  transform: translateY(0);
+}
+
 .login-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-image: url('@/assets/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   padding: 20px;
+  position: relative;
 }
+
+
 
 .login-card {
   width: 100%;
   max-width: 400px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  /* 确保卡片在遮罩层之上 */
+  position: relative;
+  z-index: 2;
+  /* 可选：给卡片添加一点透明度，让背景若隐若现 */
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .login-title {
@@ -129,9 +160,11 @@ const handleLogin = async () => {
 }
 
 .link {
-  color: #409EFF;
+  color: rgba(20, 30, 48, 0.9);
   text-decoration: none;
   margin-left: 5px;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .link:hover {
