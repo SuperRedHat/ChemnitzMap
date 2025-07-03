@@ -2,14 +2,14 @@
   <div class="home-container">
     <!-- 左侧过滤面板 -->
     <aside class="filter-panel">
-      <h3>Categories</h3>
+      <h3>{{ $t('map.categories') }}</h3>
       <ul>
         <li
           @click="handleNearbyClick()"
           :class="{ active: dataStore.filter.nearbyMode }"
           class="special-mode"
         >
-          📍 Nearby
+          📍 {{ $t('map.nearby') }}
         </li>
         <li
           @click="handleTenMinuteClick()"
@@ -31,13 +31,13 @@
           @click="handleCategoryClick('')"
           :class="{ active: !dataStore.filter.category && !isSpecialMode }"
         >
-          All
+          {{ $t('map.all') }}
         </li>
       </ul>
 
       <!-- Nearby 模式控制 -->
       <div v-if="dataStore.filter.nearbyMode" class="mode-controls nearby-controls">
-        <h4>扫描半径: {{ nearbyRadius }} 米</h4>
+        <h4>{{ $t('map.nearbyRadius', { radius: nearbyRadius }) }}</h4>
         <el-slider 
           v-model="nearbyRadius" 
           :min="100" 
@@ -47,7 +47,7 @@
           @change="onRadiusChange"
         />
         <div v-if="dataStore.filter.category" class="current-category">
-          当前分类: <strong>{{ dataStore.filter.category }}</strong>
+         {{ $t('map.nearbyCategory') }}: <strong>{{ dataStore.filter.category }}</strong>
         </div>
       </div>
 

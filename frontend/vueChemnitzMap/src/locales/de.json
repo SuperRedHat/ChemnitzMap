@@ -28,7 +28,14 @@
     "walkingTime": "Fußweg: {time} Min",
     "transitTime": "ÖPNV: {time} Min",
     "reachableRange": "Erreichbar: {distance} km",
-    "currentCategory": "Aktuelle Kategorie"
+    "currentCategory": "Aktuelle Kategorie",
+    "nearbyRadius": "Scanradius: {radius} Meter",
+    "nearbyCategory": "Aktuelle Kategorie",
+    "transportInfo": {
+      "walking": "Zu Fuß: {time} Minuten",
+      "transit": "ÖPNV: {time} Minuten",
+      "reachable": "Erreichbar: {distance} km"
+    }
   },
   "site": {
     "category": "Kategorie",
@@ -43,7 +50,17 @@
     "favorite": "Favorit",
     "favorited": "Favorisiert",
     "viewDetails": "Details anzeigen",
-    "back": "Zurück"
+    "back": "Zurück",
+    "osmId": "OSM-ID",
+    "meters": "{distance} Meter",
+    "theatreInfo": "Theaterinformationen",
+    "theatreDesc": "Dies ist ein Veranstaltungsort für darstellende Künste, wo Sie Theater, Konzerte, Tanzaufführungen und mehr genießen können.",
+    "museumInfo": "Museumsinformationen",
+    "museumDesc": "Erkunden Sie reiche historische und kulturelle Sammlungen, erfahren Sie mehr über Kunst, Wissenschaft und menschliche Zivilisation.",
+    "publicArtInfo": "Öffentliche Kunstinformationen", 
+    "publicArtDesc": "Dies ist ein Outdoor-Kunstwerk, das die Kreativität und kulturelle Vitalität der Stadt zeigt.",
+    "restaurantInfo": "Restaurantinformationen",
+    "restaurantDesc": "Probieren Sie köstliche Küche und erleben Sie lokale und internationale Esskultur."
   },
   "auth": {
     "username": "Benutzername",
@@ -80,7 +97,8 @@
     "title": "Profil",
     "updatePassword": "Passwort ändern",
     "saveChanges": "Änderungen speichern",
-    "reset": "Zurücksetzen"
+    "reset": "Zurücksetzen",
+    "changePassword": "Passwort ändern"
   },
   "favorites": {
     "title": "Meine Favoriten",
@@ -88,7 +106,8 @@
     "empty": "Noch keine Favoriten",
     "addedAt": "Favorisiert am",
     "viewOnMap": "Auf Karte anzeigen",
-    "remove": "Entfernen"
+    "remove": "Entfernen",
+    "removeConfirm": "Aus Favoriten entfernen?"
   },
   "footprints": {
     "title": "Meine Spuren",
@@ -108,7 +127,8 @@
     "collectionDistance": "Sammelentfernung",
     "cardView": "Kartenansicht",
     "mapView": "Kartenansicht",
-    "timeline": "Zeitachse"
+    "timeline": "Zeitachse",
+    "deleteConfirm": "Diese Spur löschen? (Nur Test)"
   },
   "comment": {
     "title": "Benutzerbewertungen",
@@ -146,7 +166,30 @@
     "self": "Selbst",
     "deleteConfirm": "Möchten Sie den Benutzer \"{username}\" wirklich löschen? Dies ist eine Soft-Löschung, der Benutzer kann sich nicht mehr anmelden.",
     "batchDelete": "Stapellöschung ({count})",
-    "clearSelection": "Auswahl löschen"
+    "clearSelection": "Auswahl löschen",
+    "statistics": {
+      "totalUsers": "Gesamtbenutzer",
+      "activeUsers": "Aktive Benutzer",
+      "adminCount": "Administratoren", 
+      "deletedUsers": "Gelöschte Benutzer"
+    },
+    "table": {
+      "id": "ID",
+      "username": "Benutzername",
+      "email": "E-Mail",
+      "role": "Rolle",
+      "status": "Status",
+      "location": "Standort",
+      "registeredAt": "Registriert am",
+      "operations": "Operationen"
+    },
+    "pageSize": "{size} Einträge",
+    "totalPages": "Seite {current} von {total}",
+    "site": "Ort",
+    "rating": "Bewertung",
+    "content": "Inhalt",
+    "commentTime": "Kommentarzeit",
+    "commenter": "Benutzer"
   },
   "messages": {
     "welcome": "Willkommen bei der Chemnitz Kulturkarte",

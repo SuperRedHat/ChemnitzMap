@@ -12,7 +12,7 @@
         label-position="top"
         @submit.prevent="handleLogin"
       >
-        <el-form-item label="用户名或邮箱" prop="emailOrUsername">
+        <el-form-item :label="$t('auth.username') + $t('common.or') + $t('auth.email')" prop="emailOrUsername">
           <el-input 
             v-model="loginForm.emailOrUsername" 
             placeholder="请输入用户名或邮箱"
@@ -45,8 +45,8 @@
         </el-form-item>
 
         <div class="login-footer">
-          <span>还没有账号？</span>
-          <router-link to="/register" class="link">立即注册</router-link>
+          <span>{{ $t('auth.noAccount') }}</span>
+          <router-link to="/register" class="link">{{ $t('auth.register') }}</router-link>
         </div>
       </el-form>
     </el-card>

@@ -8,32 +8,32 @@
       >
         <el-menu-item index="/admin">
           <el-icon><User /></el-icon>
-          <span>用户管理</span>
+          <span>{{ $t('admin.userManagement') }}</span>
         </el-menu-item>
         <el-menu-item index="/admin/comments">
           <el-icon><ChatLineSquare /></el-icon>
-          <span>评论管理</span>
+          <span>{{ $t('admin.commentManagement') }}</span>
         </el-menu-item>
       </el-menu>
     </div>
     <el-card>
       <template #header>
-        <h2>用户管理</h2>
+        <h2>{{ $t('admin.userManagement') }}</h2>
       </template>
 
       <!-- 统计信息 -->
       <el-row :gutter="20" class="stats-row">
         <el-col :xs="24" :sm="12" :md="6">
-          <el-statistic title="总用户数" :value="users.length" />
+          <el-statistic :title="$t('admin.statistics.totalUsers')" :value="users.length" />
         </el-col>
         <el-col :xs="24" :sm="12" :md="6">
-          <el-statistic title="活跃用户" :value="activeUserCount" />
+          <el-statistic :title="$t('admin.statistics.activeUsers')" :value="activeUserCount" />
         </el-col>
         <el-col :xs="24" :sm="12" :md="6">
-          <el-statistic title="管理员数" :value="adminCount" />
+          <el-statistic :title="$t('admin.statistics.adminCount')" :value="adminCount" />
         </el-col>
         <el-col :xs="24" :sm="12" :md="6">
-          <el-statistic title="已删除用户" :value="deletedUserCount" />
+          <el-statistic :title="$t('admin.statistics.deletedUsers')" :value="deletedUserCount" />
         </el-col>
       </el-row>
 
@@ -43,10 +43,10 @@
         v-loading="loading"
         style="width: 100%; margin-top: 20px;"
       >
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="username" label="用户名" />
-        <el-table-column prop="email" label="邮箱" />
-        <el-table-column prop="role" label="角色" width="100">
+        <el-table-column prop="id" :label="$t('admin.table.id')" width="80" />
+        <el-table-column prop="username" :label="$t('admin.table.username')" />
+        <el-table-column prop="email" :label="$t('admin.table.email')" />
+        <el-table-column prop="role" :label="$t('admin.table.role')" width="100">
           <template #default="scope">
             <el-tag :type="scope.row.role === 'admin' ? 'danger' : 'primary'">
               {{ scope.row.role === 'admin' ? '管理员' : '普通用户' }}
