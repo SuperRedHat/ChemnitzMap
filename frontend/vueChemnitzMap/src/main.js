@@ -6,6 +6,7 @@ import { createPinia }  from 'pinia';
 import App             from './App.vue';
 import router          from './router';
 import i18n            from './locales';
+import { setupInterceptors } from './api';
 
 // Element Plus
 import ElementPlus from 'element-plus';
@@ -17,6 +18,9 @@ app.use(createPinia());
 app.use(router);
 app.use(i18n); 
 app.use(ElementPlus);
+
+// 在应用初始化后设置拦截器
+setupInterceptors();
 
 // 注册所有 Element Plus 图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

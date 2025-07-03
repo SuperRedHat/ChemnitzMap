@@ -1,17 +1,17 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 
-// 根据环境变量动态设置服务器URL
+// Set server URL dynamically based on environment
 const servers = process.env.NODE_ENV === 'production' 
   ? [
       {
         url: `${process.env.API_BASE_URL}/api`,
-        description: '生产服务器'
+        description: 'Production server'
       }
     ]
   : [
       {
         url: 'http://localhost:3000/api',
-        description: '开发服务器'
+        description: 'Development server'
       }
     ];
 
@@ -19,9 +19,9 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'ChemnitzMap API',
+      title: 'Chemnitz Cultural Map API',
       version: '1.0.0',
-      description: 'Chemnitz文化地图项目的API文档',
+      description: 'RESTful API documentation for Chemnitz Cultural Map project',
       contact: {
         name: 'API Support',
         email: 'support@chemnitzmap.com'
@@ -33,10 +33,37 @@ const options = {
         bearerAuth: {
           type: 'http',
           scheme: 'bearer',
-          bearerFormat: 'JWT'
+          bearerFormat: 'JWT',
+          description: 'Enter JWT token in format: Bearer {token}'
         }
       }
-    }
+    },
+    tags: [
+      {
+        name: 'Users',
+        description: 'User authentication and management'
+      },
+      {
+        name: 'Categories',
+        description: 'Site categories'
+      },
+      {
+        name: 'Sites',
+        description: 'Cultural sites information'
+      },
+      {
+        name: 'Favorites',
+        description: 'User favorites management'
+      },
+      {
+        name: 'Footprints',
+        description: 'User collection records'
+      },
+      {
+        name: 'Comments',
+        description: 'Site reviews and ratings'
+      }
+    ]
   },
   apis: ['./routes/*.js', './docs/*.js'],
 };

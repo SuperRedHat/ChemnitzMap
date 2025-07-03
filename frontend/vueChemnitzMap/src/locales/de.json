@@ -35,6 +35,41 @@
       "walking": "Zu Fuß: {time} Minuten",
       "transit": "ÖPNV: {time} Minuten",
       "reachable": "Erreichbar: {distance} km"
+    },
+    "legend": {
+      "title": "Kulturorte-Kategorien",
+      "youAreHere": "Sie sind hier"
+    },
+    "getLocation": "Aktuellen Standort abrufen",
+    "locationNotSupported": "Browser unterstützt keine Geolokalisierung",
+    "gettingLocation": "Standort wird abgerufen...",
+    "locationFailed": "Standortabruf fehlgeschlagen, bitte Standortberechtigung prüfen",
+    "savingLocation": "Standort wird gespeichert...",
+    "exitMode": "Bitte zuerst {mode}-Modus beenden",
+    "popup": {
+      "category": "Kategorie",
+      "address": "Adresse",
+      "distance": "Entfernung",
+      "meters": "{distance} Meter",
+      "collect": "Sammeln",
+      "collected": "Gesammelt",
+      "tooFar": "Zu weit",
+      "favorite": "Favorit",
+      "favorited": "Favorisiert",
+      "viewDetails": "Details anzeigen"
+    },
+    "timeMarks": {
+      "5min": "5 Min",
+      "10min": "10 Min",
+      "15min": "15 Min",
+      "20min": "20 Min",
+      "30min": "30 Min"
+    },
+    "radiusMarks": {
+      "500m": "500m",
+      "1km": "1km",
+      "2km": "2km",
+      "5km": "5km"
     }
   },
   "site": {
@@ -60,7 +95,10 @@
     "publicArtInfo": "Öffentliche Kunstinformationen", 
     "publicArtDesc": "Dies ist ein Outdoor-Kunstwerk, das die Kreativität und kulturelle Vitalität der Stadt zeigt.",
     "restaurantInfo": "Restaurantinformationen",
-    "restaurantDesc": "Probieren Sie köstliche Küche und erleben Sie lokale und internationale Esskultur."
+    "restaurantDesc": "Probieren Sie köstliche Küche und erleben Sie lokale und internationale Esskultur.",
+    "basicInfo": "Grundinformationen",
+    "location": "Standort",
+    "doesNotExist": "Ort existiert nicht"
   },
   "auth": {
     "username": "Benutzername",
@@ -82,7 +120,14 @@
     "currentLocation": "Aktueller Standort",
     "notSet": "Nicht festgelegt",
     "latitude": "Breitengrad",
-    "longitude": "Längengrad"
+    "longitude": "Längengrad",
+    "usernameOrEmail": "Benutzername oder E-Mail",
+    "enterUsernameOrEmail": "Bitte Benutzername oder E-Mail eingeben",
+    "enterPassword": "Bitte Passwort eingeben",
+    "enterUsername": "Bitte Benutzername eingeben",
+    "enterEmail": "Bitte E-Mail eingeben",
+    "enterPasswordHint": "Bitte Passwort eingeben (mindestens 6 Zeichen)",
+    "confirmPasswordPlaceholder": "Bitte Passwort erneut eingeben"
   },
   "validation": {
     "required": "Dieses Feld ist erforderlich",
@@ -91,14 +136,25 @@
     "passwordMatch": "Passwörter stimmen nicht überein",
     "loginFailed": "Ungültiger Benutzername oder Passwort",
     "registerFailed": "Registrierung fehlgeschlagen",
-    "updateFailed": "Aktualisierung fehlgeschlagen"
+    "updateFailed": "Aktualisierung fehlgeschlagen",
+    "usernameOrEmailRequired": "Bitte Benutzername oder E-Mail eingeben",
+    "passwordRequired": "Bitte Passwort eingeben",
+    "passwordMinLength": "Passwort muss mindestens 6 Zeichen lang sein",
+    "usernameRequired": "Bitte Benutzername eingeben",
+    "usernameLength": "Benutzername muss zwischen 3 und 20 Zeichen lang sein",
+    "emailRequired": "Bitte E-Mail eingeben",
+    "emailFormat": "Bitte gültige E-Mail-Adresse eingeben",
+    "passwordMismatch": "Passwörter stimmen nicht überein!",
+    "confirmPasswordRequired": "Bitte Passwort erneut eingeben"
   },
   "profile": {
     "title": "Profil",
     "updatePassword": "Passwort ändern",
     "saveChanges": "Änderungen speichern",
     "reset": "Zurücksetzen",
-    "changePassword": "Passwort ändern"
+    "changePassword": "Passwort ändern",
+    "passwordPlaceholder": "Leer lassen, wenn Passwort nicht geändert wird",
+    "newPasswordPlaceholder": "Mindestens 6 Zeichen"
   },
   "favorites": {
     "title": "Meine Favoriten",
@@ -107,7 +163,8 @@
     "addedAt": "Favorisiert am",
     "viewOnMap": "Auf Karte anzeigen",
     "remove": "Entfernen",
-    "removeConfirm": "Aus Favoriten entfernen?"
+    "removeConfirm": "Aus Favoriten entfernen?",
+    "viewDetails": "Details anzeigen"
   },
   "footprints": {
     "title": "Meine Spuren",
@@ -128,7 +185,16 @@
     "cardView": "Kartenansicht",
     "mapView": "Kartenansicht",
     "timeline": "Zeitachse",
-    "deleteConfirm": "Diese Spur löschen? (Nur Test)"
+    "deleteConfirm": "Diese Spur löschen? (Nur Test)",
+    "viewOnMap": "Auf Karte anzeigen",
+    "viewDetails": "Details anzeigen",
+    "deleteTest": "Löschen (Test)",
+    "startExploring": "Beginne deine Erkundungsreise!",
+    "firstExploreDesc": "1. Ort sammeln",
+    "cityWandererDesc": "25 Orte sammeln",
+    "culturalAmbassadorDesc": "100 Orte sammeln",
+    "meters": "{distance} Meter",
+    "category": "Kategorie"
   },
   "comment": {
     "title": "Benutzerbewertungen",
@@ -147,7 +213,8 @@
     "contentRequired": "Bitte geben Sie einen Bewertungstext ein",
     "submitSuccess": "Bewertung erfolgreich abgegeben",
     "deleteConfirm": "Möchten Sie diese Bewertung wirklich löschen?",
-    "deleteSuccess": "Bewertung erfolgreich gelöscht"
+    "deleteSuccess": "Bewertung erfolgreich gelöscht",
+    "ratingTexts": ["Sehr schlecht", "Schlecht", "Durchschnittlich", "Gut", "Ausgezeichnet"]
   },
   "admin": {
     "userManagement": "Benutzerverwaltung",
@@ -189,7 +256,20 @@
     "rating": "Bewertung",
     "content": "Inhalt",
     "commentTime": "Kommentarzeit",
-    "commenter": "Benutzer"
+    "commenter": "Benutzer",
+    "deleteConfirmTitle": "Löschbestätigung",
+    "confirmButtonText": "Bestätigen",
+    "cancelButtonText": "Abbrechen",
+    "fetchError": "Fehler beim Abrufen der Benutzerliste",
+    "deleteSuccess": "Erfolgreich gelöscht",
+    "deleteError": "Löschen fehlgeschlagen",
+    "viewSite": "Ort anzeigen",
+    "reviewContent": "Kommentarinhalt",
+    "fetchCommentsError": "Fehler beim Abrufen der Kommentarliste",
+    "batchDeleteConfirm": "Möchten Sie die ausgewählten {count} Kommentare wirklich löschen?",
+    "batchDeleteConfirmTitle": "Stapellöschung bestätigen",
+    "batchDeleteSuccess": "Stapellöschung erfolgreich",
+    "batchDeleteError": "Stapellöschung fehlgeschlagen"
   },
   "messages": {
     "welcome": "Willkommen bei der Chemnitz Kulturkarte",
@@ -203,8 +283,21 @@
     "unfavoriteSuccess": "Favorisierung entfernt",
     "locationRequired": "Bitte zuerst aktuellen Standort abrufen",
     "locationFailed": "Standortabruf fehlgeschlagen, bitte Standortberechtigung prüfen",
-    "nearbyModeOn": "Nähe-Modus aktiviert, Scanradius {radius} Meter",
-    "tenMinuteModeOn": "10-Minuten-Stadt-Modus aktiviert, erreichbare Entfernung {distance} km"
+    "radiusUpdated": "Scanradius auf {radius} Meter aktualisiert",
+    "travelTimeUpdated": "Reisezeit auf {time} Minuten aktualisiert, erreichbare Entfernung {distance} km",
+    "loginFirst": "Bitte zuerst anmelden",
+    "registerFailed": "Registrierung fehlgeschlagen",
+    "loginFailed": "Anmeldung fehlgeschlagen",
+    "updateFailed": "Aktualisierung fehlgeschlagen",
+    "favoriteFailed": "Favorisierung fehlgeschlagen",
+    "unfavoriteFailed": "Entfernen der Favorisierung fehlgeschlagen",
+    "collectFailed": "Sammlung fehlgeschlagen",
+    "locationError": "Aktueller Standort kann nicht abgerufen werden",
+    "footprintDeleted": "Fußabdruck gelöscht",
+    "deleteFailed": "Löschen fehlgeschlagen",
+    "milestoneTitle": "🎉 Glückwunsch zum Erreichen eines Meilensteins!",
+    "milestoneMessage": "Sie haben Ihre {count}. Medaille erhalten!",
+    "tooFarMessage": "Zu weit entfernt (aktuelle Entfernung: {distance} Meter)"
   },
   "about": {
     "subtitle": "Stadtkultur erkunden, wunderbares Leben entdecken",
@@ -225,10 +318,72 @@
       "a4": "Wir verwenden branchenübliche Verschlüsselung zum Schutz Ihrer Daten. Passwörter werden verschlüsselt gespeichert und Standortdaten nur bei aktiver Freigabe erfasst.",
       "q5": "Wie kann ich Daten beitragen?",
       "a5": "Die Ortsdaten stammen von OpenStreetMap. Sie können neue Orte beitragen, indem Sie OpenStreetMap bearbeiten."
+    },
+    "intro": {
+      "title": "Projektvorstellung",
+      "content": "Die Chemnitz Kulturkarte ist eine interaktive Webanwendung, die Touristen und Einwohnern hilft, die reichen kulturellen Ressourcen von Chemnitz zu entdecken. Durch eine intuitive Kartenoberfläche und leistungsstarke Suchfunktionen können Benutzer leicht Theater, Museen, öffentliche Kunst und Restaurants finden und ihre eigene kulturelle Entdeckungsreise erstellen."
+    },
+    "features": {
+      "title": "Funktionsübersicht",
+      "mapBrowsing": {
+        "title": "Kartenbrowsen",
+        "desc": "Interaktive Karte zeigt alle Kulturorte mit farbcodierten Kategorien zur einfachen Identifizierung"
+      },
+      "searchFilter": {
+        "title": "Suche & Filter",
+        "desc": "Schnelle Standortsuche nach Stichwort und Kategoriefilterung"
+      },
+      "userFeatures": {
+        "title": "Benutzerfunktionen",
+        "desc": "Registrieren Sie sich, um Favoriten zu speichern und Ihre Erkundungsspuren zu verfolgen"
+      },
+      "specialModes": {
+        "title": "Spezielle Modi",
+        "desc": "In-der-Nähe-Modus und 10-Minuten-Stadt-Modus für personalisierte Erkundung",
+        "nearbyMode": "In-der-Nähe-Modus Demo",
+        "tenMinuteCity": "10-Minuten-Stadt Demo"
+      }
+    },
+    "howTo": {
+      "title": "Anleitung",
+      "step1": "Durchsuchen Sie die Karte oder verwenden Sie Filter, um interessante Orte zu finden",
+      "step2": "Klicken Sie auf Markierungen für detaillierte Informationen",
+      "step3": "Registrieren Sie ein Konto, um Favoriten zu speichern",
+      "step4": "Aktivieren Sie Standortdienste, um nahegelegene Orte zu sammeln",
+      "step5": "Verdienen Sie Erfolgsabzeichen durch Erkunden verschiedener Kategorien"
+    },
+    "data": {
+      "title": "Datenquellen",
+      "content": "Alle Standortdaten stammen von OpenStreetMap, einem Open-Source-Kartenprojekt, das von einer globalen Community gepflegt wird. Die Daten werden regelmäßig aktualisiert, um Genauigkeit und Vollständigkeit zu gewährleisten."
+    },
+    "tech": {
+      "title": "Technologie-Stack",
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "api": "API & Daten"
+    },
+    "contact": {
+      "title": "Kontaktinformationen",
+      "content": "Dieses Projekt wurde im Rahmen des Kurses Datenbank- und Webtechnologien an der TU Chemnitz entwickelt. Bei Fragen oder Anregungen wenden Sie sich bitte an die Projektdokumentation."
     }
   },
   "common": {
     "step": "Schritt",
-    "documentation": "Dokumentation"
+    "documentation": "Dokumentation",
+    "or": "oder",
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "delete": "Löschen"
+  },
+  "locale": "de",
+  "errors": {
+    "loadCategoriesFailed": "Fehler beim Laden der Kategorien",
+    "loadSitesFailed": "Fehler beim Abrufen der Orte",
+    "fetchFavoritesFailed": "Fehler beim Abrufen der Favoriten",
+    "checkFavoriteStatusFailed": "Fehler beim Überprüfen des Favoritenstatus",
+    "fetchFootprintsFailed": "Fehler beim Abrufen der Fußabdrücke",
+    "fetchStatsFailed": "Fehler beim Abrufen der Statistiken",
+    "checkCollectionStatusFailed": "Fehler beim Überprüfen des Sammlungsstatus"
   }
 }

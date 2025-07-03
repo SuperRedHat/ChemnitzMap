@@ -29,7 +29,7 @@ module.exports = (db) => {
 
       // 验证输入
       if (!lat || !lon) {
-        return res.status(400).json({ error: '需要提供当前位置' });
+        return res.status(400).json({ error: req.__('errors.needLocation') });
       }
 
       // 获取地点信息
@@ -39,7 +39,7 @@ module.exports = (db) => {
       );
       
       if (!site) {
-        return res.status(404).json({ error: '地点不存在' });
+        return res.status(404).json({ error: req.__('errors.siteNotFound') });
       }
 
       // 计算距离
@@ -48,7 +48,7 @@ module.exports = (db) => {
       // 检查距离（400米内）
       if (distance > 400) {
         return res.status(400).json({ 
-          error: '距离太远，无法收集', 
+          error: req.__('errors.tooFarToCollect'), 
           distance,
           maxDistance: 400 
         });
@@ -61,7 +61,7 @@ module.exports = (db) => {
       );
       
       if (existing.length > 0) {
-        return res.status(400).json({ error: '已经收集过该地点' });
+        return res.status(400).json({ error: req.__('errors.alreadyCollected') });
       }
 
       // 添加足迹
@@ -71,16 +71,16 @@ module.exports = (db) => {
       );
 
       // 检查成就和里程碑
-      const stats = await getStats(db, userId);
+      const stats = await getStats(db, userId, req);
 
       res.status(201).json({ 
-        message: '收集成功！',
+        message: req.__('messages.collectSuccess'),
         distance,
         stats
       });
     } catch (err) {
-      console.error('收集地点错误:', err);
-      res.status(500).json({ error: '收集失败' });
+      console.error('Collect site error:', err);
+      res.status(500).json({ error: req.__('errors.collectFailed') });
     }
   });
 
@@ -101,19 +101,19 @@ module.exports = (db) => {
 
       res.json(footprints);
     } catch (err) {
-      console.error('获取足迹列表错误:', err);
-      res.status(500).json({ error: '获取足迹失败' });
+      console.error('Get footprints error:', err);
+      res.status(500).json({ error: req.__('errors.fetchFootprintsFailed') });
     }
   });
 
   // 获取统计信息
   router.get('/stats', authenticateToken, async (req, res) => {
     try {
-      const stats = await getStats(db, req.user.id);
+      const stats = await getStats(db, req.user.id, req);
       res.json(stats);
     } catch (err) {
-      console.error('获取统计信息错误:', err);
-      res.status(500).json({ error: '获取统计失败' });
+      console.error('Get stats error:', err);
+      res.status(500).json({ error: req.__('errors.fetchStatsFailed') });
     }
   });
 
@@ -138,8 +138,8 @@ module.exports = (db) => {
         res.json({ isCollected: false });
       }
     } catch (err) {
-      console.error('检查收集状态错误:', err);
-      res.status(500).json({ error: '检查失败' });
+      console.error('Check collection status error:', err);
+      res.status(500).json({ error: req.__('errors.checkCollectionStatusFailed') });
     }
   });
 
@@ -155,18 +155,18 @@ module.exports = (db) => {
       );
 
       if (result.affectedRows === 0) {
-        return res.status(404).json({ error: '未找到该足迹记录' });
+        return res.status(404).json({ error: req.__('errors.footprintNotFound') });
       }
 
-      res.json({ message: '删除成功' });
+      res.json({ message: req.__('messages.footprintDeleted') });
     } catch (err) {
-      console.error('删除足迹错误:', err);
-      res.status(500).json({ error: '删除失败' });
+      console.error('Delete footprint error:', err);
+      res.status(500).json({ error: req.__('errors.deleteFootprintFailed') });
     }
   });
 
   // 获取统计信息的辅助函数
-  async function getStats(db, userId) {
+  async function getStats(db, userId, req) {
     // 获取总收集数
     const [[{ total }]] = await db.query(
       'SELECT COUNT(*) as total FROM Footprint WHERE user_id = ?',
@@ -194,14 +194,15 @@ module.exports = (db) => {
     categoryStats.forEach(stat => {
       if (stat.count >= 5) {
         const achievementMap = {
-          'Museum': { icon: '🏛️', name: '博物馆爱好者' },
-          'Theatre': { icon: '🎭', name: '戏剧达人' },
-          'Public Art': { icon: '🎨', name: '艺术收藏家' },
-          'Restaurant': { icon: '🍽️', name: '美食探索者' }
+          'Museum': { icon: '🏛️', nameKey: 'achievements.museumLover' },
+          'Theatre': { icon: '🎭', nameKey: 'achievements.theaterFan' },
+          'Public Art': { icon: '🎨', nameKey: 'achievements.artCollector' },
+          'Restaurant': { icon: '🍽️', nameKey: 'achievements.foodExplorer' }
         };
         if (achievementMap[stat.category]) {
           achievements.push({
-            ...achievementMap[stat.category],
+            icon: achievementMap[stat.category].icon,
+            name: req.__(achievementMap[stat.category].nameKey),
             progress: `${stat.count}/5`
           });
         }
@@ -210,13 +211,25 @@ module.exports = (db) => {
 
     // 特殊成就
     if (total >= 1) {
-      achievements.push({ icon: '🌟', name: '初次探索', progress: '已完成' });
+      achievements.push({ 
+        icon: '🌟', 
+        name: req.__('achievements.firstExplore'), 
+        progress: req.__('achievements.completed') 
+      });
     }
     if (total >= 25) {
-      achievements.push({ icon: '🚀', name: '城市漫游者', progress: '已完成' });
+      achievements.push({ 
+        icon: '🚀', 
+        name: req.__('achievements.cityWanderer'), 
+        progress: req.__('achievements.completed') 
+      });
     }
     if (total >= 100) {
-      achievements.push({ icon: '👑', name: '文化大使', progress: '已完成' });
+      achievements.push({ 
+        icon: '👑', 
+        name: req.__('achievements.culturalAmbassador'), 
+        progress: req.__('achievements.completed') 
+      });
     }
 
     // 计算里程碑（每5个地点一个勋章）

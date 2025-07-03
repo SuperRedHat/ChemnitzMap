@@ -279,7 +279,7 @@ const openApiDocs = () => {
 
 // 打开GitHub
 const openGithub = () => {
-  window.open('https://github.com/your-repo/chemnitz-map', '_blank');
+  window.open('https://github.com/SuperRedHat/ChemnitzMap/', '_blank');
 };
 
 // 模拟获取统计数据

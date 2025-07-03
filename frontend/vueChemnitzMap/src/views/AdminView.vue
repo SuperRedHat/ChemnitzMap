@@ -49,33 +49,33 @@
         <el-table-column prop="role" :label="$t('admin.table.role')" width="100">
           <template #default="scope">
             <el-tag :type="scope.row.role === 'admin' ? 'danger' : 'primary'">
-              {{ scope.row.role === 'admin' ? '管理员' : '普通用户' }}
+              {{ scope.row.role === 'admin' ? $t('admin.admin') : $t('admin.user') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="deleted" label="状态" width="100">
+        <el-table-column prop="deleted" :label="$t('admin.status')" width="100">
           <template #default="scope">
             <el-tag :type="scope.row.deleted ? 'danger' : 'success'">
-              {{ scope.row.deleted ? '已删除' : '正常' }}
+              {{ scope.row.deleted ? $t('admin.deleted') : $t('admin.normal') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="位置" width="100">
+        <el-table-column :label="$t('admin.table.location')" width="100">
           <template #default="scope">
-            <span v-if="scope.row.current_lat && scope.row.current_lon" title="已设置位置">
-              📍 已定位
+            <span v-if="scope.row.current_lat && scope.row.current_lon" :title="$t('admin.located')">
+              📍 {{ $t('admin.located') }}
             </span>
             <span v-else style="color: #909399;">
-              未定位
+              {{ $t('admin.notLocated') }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="created_at" label="注册时间" width="180">
+        <el-table-column prop="created_at" :label="$t('admin.table.registeredAt')" width="180">
           <template #default="scope">
             {{ formatDate(scope.row.created_at) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column :label="$t('admin.operations')" width="150" fixed="right">
           <template #default="scope">
             <el-button
               v-if="!scope.row.deleted && scope.row.id !== authStore.userId"
@@ -83,10 +83,10 @@
               size="small"
               @click="handleDelete(scope.row)"
             >
-              删除
+              {{ $t('admin.delete') }}
             </el-button>
             <span v-else-if="scope.row.id === authStore.userId" class="self-tag">
-              本人
+              {{ $t('admin.self') }}
             </span>
           </template>
         </el-table-column>
@@ -102,7 +102,9 @@ import { ref, computed, onMounted } from 'vue';
 import { http } from '@/api';
 import { useAuthStore } from '@/stores/authStore';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const users = ref([]);
 const loading = ref(false);
@@ -129,7 +131,8 @@ const deletedUserCount = computed(() =>
 // 格式化日期
 const formatDate = (dateString) => {
   if (!dateString) return '';
-  return new Date(dateString).toLocaleString('zh-CN');
+  const locale = t('locale') === 'zh' ? 'zh-CN' : t('locale') === 'de' ? 'de-DE' : 'en-US';
+  return new Date(dateString).toLocaleString(locale);
 };
 
 // 获取用户列表
@@ -139,7 +142,7 @@ const fetchUsers = async () => {
     const response = await http.get('/users');
     users.value = response.data;
   } catch (error) {
-    ElMessage.error('获取用户列表失败');
+    ElMessage.error(t('admin.fetchError'));
   } finally {
     loading.value = false;
   }
@@ -149,17 +152,17 @@ const fetchUsers = async () => {
 const handleDelete = async (user) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除用户 "${user.username}" 吗？此操作为软删除，用户将无法登录。`,
-      '删除确认',
+      t('admin.deleteConfirm', { username: user.username }),
+      t('admin.deleteConfirmTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('admin.confirmButtonText'),
+        cancelButtonText: t('admin.cancelButtonText'),
         type: 'warning',
       }
     );
 
     await http.delete(`/users/${user.id}`);
-    ElMessage.success('删除成功');
+    ElMessage.success(t('admin.deleteSuccess'));
     fetchUsers(); // 重新获取用户列表
   } catch (error) {
     if (error !== 'cancel') {

@@ -6,11 +6,26 @@ const swaggerSpec = require('./swagger');
 const app = express();
 const { seedAdmin } = require('./scripts/seedAdmin.js');
 const mysql = require('mysql2/promise');
-
+const i18n = require('./config/i18n');
+const i18nMiddleware = require('./middleware/i18n');
+const { checkAndGenerateDocs } = require('./scripts/checkSwaggerCoverage');
 app.use(cors()); 
 app.use(express.json());
+// i18n 中间件
+app.use(i18n.init);
+app.use(i18nMiddleware);
+
 
 async function createApp() {
+  // 检查 Swagger 文档覆盖率
+  console.log('\n🔍 Checking API documentation coverage...\n');
+  const coverage = checkAndGenerateDocs();
+  
+  if (coverage.undocumented > 0) {
+    console.log('\n⚠️  Warning: Some APIs are not documented!');
+    console.log('   Please check /docs/generated-swagger.js for templates.\n');
+  }
+  
   // 建立数据库连接池
   const db = await mysql.createPool({
     host:     process.env.DB_HOST,
@@ -54,7 +69,7 @@ createApp().then(app => {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
     console.log(`🚀 Server listening on http://localhost:${PORT}`);
-    console.log(`📚 API文档地址: http://localhost:${PORT}/api-docs`);
+    console.log(`📚 API documentation: http://localhost:${PORT}/api-docs`);
   });
 }).catch(err => {
   console.error('❌ Failed to start server:', err);

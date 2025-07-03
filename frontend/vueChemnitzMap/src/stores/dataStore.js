@@ -1,6 +1,7 @@
 // frontend/src/stores/dataStore.js
 import { defineStore } from 'pinia'
 import { fetchCategories, fetchSites } from '@/api'   // fetchSites() 返回站点数组
+import i18n from '@/locales';
 
 export const useDataStore = defineStore('data', {
   state: () => ({
@@ -63,24 +64,24 @@ export const useDataStore = defineStore('data', {
       try {
         this.categories = await fetchCategories()
       } catch (err) {
-        this.error = '加载分类失败'
+        this.error = i18n.global.t('errors.loadCategoriesFailed')
         console.error(err)
       }
     },
 
     /** 只调用一次，拿到全量站点，然后应用一次 filter **/
     async loadAllSites() {
-      console.log('💡 loadAllSites(), 当前 filter:', this.filter)
+      console.log('💡 loadAllSites(), current filter:', this.filter)
       this.loading = true
       this.error = null
       try {
         // 不带任何参数，一次性取回所有站点
         this.allSites = await fetchSites()  
-        console.log('💡 拉到的 allSites 共', this.allSites.length, '条')
+        console.log('💡 Fetched allSites count:', this.allSites.length)
         // 第一次也要跑一次过滤（此时 filter 可能是 {category:'', q:''}）
         this.applyFilter()
       } catch (err) {
-        this.error = '拉取站点失败'
+        this.error = i18n.global.t('errors.loadSitesFailed')
         console.error(err)
         this.allSites = []
         this.sites = []

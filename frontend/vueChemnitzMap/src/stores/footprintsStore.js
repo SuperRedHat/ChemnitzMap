@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { http } from '@/api';
 import { ElMessage, ElNotification } from 'element-plus';
 import { useAuthStore } from './authStore';
+import i18n from '@/locales';
 
 export const useFootprintsStore = defineStore('footprints', {
   state: () => ({
@@ -46,7 +47,7 @@ export const useFootprintsStore = defineStore('footprints', {
         this.footprints = response.data;
         this.footprintSiteIds = new Set(response.data.map(f => f.site_id));
       } catch (error) {
-        console.error('获取足迹列表失败:', error);
+        console.error('Failed to fetch footprints:', error);
       } finally {
         this.loading = false;
       }
@@ -61,7 +62,7 @@ export const useFootprintsStore = defineStore('footprints', {
         const response = await http.get('/footprints/stats');
         this.stats = response.data;
       } catch (error) {
-        console.error('获取统计信息失败:', error);
+        console.error('Failed to fetch statistics:', error);
       }
     },
 
@@ -69,13 +70,13 @@ export const useFootprintsStore = defineStore('footprints', {
     async collectSite(siteId, siteName, userLocation) {
       const authStore = useAuthStore();
       if (!authStore.isAuthenticated) {
-        ElMessage.warning('请先登录');
+        ElMessage.warning(i18n.global.t('messages.loginFirst'));
         return { success: false, needLogin: true };
       }
 
       if (!userLocation) {
-        ElMessage.error('无法获取当前位置');
-        return { success: false, error: '无法获取当前位置' };
+        ElMessage.error(i18n.global.t('messages.locationError'));
+        return { success: false, error: i18n.global.t('messages.locationError') };
       }
 
       try {
@@ -88,7 +89,7 @@ export const useFootprintsStore = defineStore('footprints', {
         
         // 显示成功消息
         ElMessage.success({
-          message: `成功收集 "${siteName}"！`,
+          message: i18n.global.t('messages.collectSuccess', { name: siteName }),
           duration: 3000,
           showClose: true
         });
@@ -99,8 +100,8 @@ export const useFootprintsStore = defineStore('footprints', {
         // 检查是否达成新的里程碑
         if (this.stats.total % 5 === 0) {
           ElNotification({
-            title: '🎉 恭喜达成里程碑！',
-            message: `您已获得第 ${this.stats.medals} 枚勋章！`,
+            title: i18n.global.t('messages.milestoneTitle'),
+            message: i18n.global.t('messages.milestoneMessage', { count: this.stats.medals }),
             type: 'success',
             duration: 5000,
             position: 'top-right'
@@ -112,11 +113,11 @@ export const useFootprintsStore = defineStore('footprints', {
         
         return { success: true };
       } catch (error) {
-        const message = error.response?.data?.error || '收集失败';
+        const message = error.response?.data?.error || i18n.global.t('messages.collectFailed');
         const distance = error.response?.data?.distance;
         
         if (distance) {
-          ElMessage.error(`${message}（当前距离：${distance}米）`);
+          ElMessage.error(i18n.global.t('messages.tooFarMessage', { distance }));
         } else {
           ElMessage.error(message);
         }
@@ -139,7 +140,7 @@ export const useFootprintsStore = defineStore('footprints', {
         }
         return response.data;
       } catch (error) {
-        console.error('检查收集状态失败:', error);
+        console.error('Failed to check collection status:', error);
         return null;
       }
     },
@@ -150,14 +151,14 @@ export const useFootprintsStore = defineStore('footprints', {
         await http.delete(`/footprints/${siteId}`);
         this.footprintSiteIds.delete(siteId);
         this.footprints = this.footprints.filter(f => f.site_id !== siteId);
-        ElMessage.success('已删除足迹');
+        ElMessage.success(i18n.global.t('messages.footprintDeleted'));
         
         // 重新获取统计信息
         this.fetchStats();
         
         return { success: true };
       } catch (error) {
-        const message = error.response?.data?.error || '删除失败';
+        const message = error.response?.data?.error || i18n.global.t('messages.deleteFailed');
         ElMessage.error(message);
         return { success: false, error: message };
       }

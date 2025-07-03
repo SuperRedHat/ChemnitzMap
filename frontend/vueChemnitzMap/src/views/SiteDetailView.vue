@@ -11,9 +11,9 @@
               :type="favoritesStore.isFavorited(site.id) ? 'warning' : 'default'"
               @click="handleFavorite"
             >
-              {{ favoritesStore.isFavorited(site.id) ? '已收藏' : '收藏' }}
+              {{ favoritesStore.isFavorited(site.id) ? $t('site.favorited') : $t('site.favorite') }}
             </el-button>
-            <el-button @click="$router.back()">返回</el-button>
+            <el-button @click="$router.back()">{{ $t('common.back') }}</el-button>
           </div>
         </div>
       </template>
@@ -22,28 +22,28 @@
         <el-row :gutter="20">
           <el-col :xs="24" :md="12">
             <div class="info-section">
-              <h3>基本信息</h3>
+              <h3>{{ $t('site.basicInfo') }}</h3>
               <div class="info-item">
-                <span class="label">类别:</span>
+                <span class="label">{{ $t('site.category') }}:</span>
                 <el-tag :color="site.color" effect="dark">{{ site.category }}</el-tag>
               </div>
               <div class="info-item" v-if="site.address">
-                <span class="label">地址:</span>
+                <span class="label">{{ $t('site.address') }}:</span>
                 <span>{{ site.address }}</span>
               </div>
               <div class="info-item">
-                <span class="label">坐标:</span>
+                <span class="label">{{ $t('site.coordinates') }}:</span>
                 <span>{{ site.lat.toFixed(6) }}, {{ site.lon.toFixed(6) }}</span>
               </div>
               <div class="info-item" v-if="site.osm_id">
-                <span class="label">OSM ID:</span>
+                <span class="label">{{ $t('site.osmId') }}:</span>
                 <span>{{ site.osm_id }}</span>
               </div>
             </div>
 
             <div class="description-section">
-              <h3>描述</h3>
-              <p>{{ site.description || '暂无描述信息' }}</p>
+              <h3>{{ $t('site.description') }}</h3>
+              <p>{{ site.description || $t('site.noDescription') }}</p>
               
               <!-- 根据类别显示不同的额外信息 -->
               <div class="category-info" v-if="site.category === 'Theatre'">
@@ -62,8 +62,8 @@
                 <div class="icon-info">
                   <span class="icon">🏛️</span>
                   <div>
-                    <h4>博物馆信息</h4>
-                    <p>探索丰富的历史文化收藏，了解艺术、科学和人类文明的精彩故事。</p>
+                    <h4>{{ $t('site.museumInfo') }}</h4>
+                    <p>{{ $t('site.museumDesc') }}</p>
                   </div>
                 </div>
               </div>
@@ -73,8 +73,8 @@
                 <div class="icon-info">
                   <span class="icon">🎨</span>
                   <div>
-                    <h4>公共艺术信息</h4>
-                    <p>这是一件户外艺术作品，展现了城市的创意和文化活力。</p>
+                    <h4>{{ $t('site.publicArtInfo') }}</h4>
+                    <p>{{ $t('site.publicArtDesc') }}</p>
                   </div>
                 </div>
               </div>
@@ -84,8 +84,8 @@
                 <div class="icon-info">
                   <span class="icon">🍽️</span>
                   <div>
-                    <h4>餐厅信息</h4>
-                    <p>品尝美味佳肴，体验当地和国际美食文化。</p>
+                    <h4>{{ $t('site.restaurantInfo') }}</h4>
+                    <p>{{ $t('site.restaurantDesc') }}</p>
                   </div>
                 </div>
               </div>
@@ -93,7 +93,7 @@
 
             <!-- 评论部分 -->
             <div class="comment-section">
-              <h3>用户评价</h3>
+              <h3>{{ $t('comment.title') }}</h3>
               
               <!-- 评分概览 -->
               <div class="rating-overview">
@@ -105,7 +105,7 @@
                     show-score 
                     text-color="#ff9900"
                   />
-                  <span class="rating-count">（{{ ratingCount }} 条评价）</span>
+                  <span class="rating-count">{{ $t('comment.ratingCount', { count: ratingCount }) }}</span>
                 </div>
                 
                 <el-button 
@@ -113,16 +113,16 @@
                   type="primary" 
                   @click="showCommentDialog = true"
                 >
-                  写评论
+                  {{ $t('comment.writeReview') }}
                 </el-button>
                 <el-button 
                   v-else-if="!authStore.isAuthenticated"
                   @click="$router.push('/login')"
                 >
-                  登录后评论
+                  {{ $t('comment.loginToReview') }}
                 </el-button>
                 <div v-else-if="hasCommented" class="commented-tip">
-                  您已评论过该地点
+                  {{ $t('comment.alreadyReviewed') }}
                 </div>
               </div>
 
@@ -149,7 +149,7 @@
                       text
                       @click="handleDeleteComment(comment.id)"
                     >
-                      删除
+                      {{ $t('common.delete') }}
                     </el-button>
                   </div>
                   <div class="comment-text">{{ comment.text }}</div>
@@ -157,35 +157,35 @@
                 
                 <div v-if="comments.length > 5 && !showAllComments" class="view-more">
                   <el-button text @click="showAllComments = true">
-                    查看全部 {{ comments.length }} 条评论
+                    {{ $t('comment.viewAll', { count: comments.length }) }}
                   </el-button>
                 </div>
               </div>
               
-              <el-empty v-else description="暂无评价" />
+              <el-empty v-else :description="$t('comment.noReviews')" />
             </div>
 
             <!-- 写评论对话框 -->
             <el-dialog 
               v-model="showCommentDialog" 
-              title="写评论" 
+              :title="$t('comment.writeReview')" 
               width="500px"
             >
               <el-form @submit.prevent="submitComment">
-                <el-form-item label="评分">
+                <el-form-item :label="$t('comment.rating')">
                   <el-rate 
                     v-model="newComment.rating" 
-                    :texts="['很差', '差', '一般', '好', '很好']"
+                    :texts="ratingTexts"
                     show-text
                   />
                 </el-form-item>
                 
-                <el-form-item label="评价内容">
+                <el-form-item :label="$t('comment.reviewContent')">
                   <el-input 
                     v-model="newComment.text" 
                     type="textarea" 
                     :rows="4"
-                    placeholder="分享您的体验..."
+                    :placeholder="$t('comment.shareExperience')"
                     maxlength="500"
                     show-word-limit
                   />
@@ -193,13 +193,13 @@
               </el-form>
               
               <template #footer>
-                <el-button @click="showCommentDialog = false">取消</el-button>
+                <el-button @click="showCommentDialog = false">{{ $t('common.cancel') }}</el-button>
                 <el-button 
                   type="primary" 
                   @click="submitComment"
                   :loading="submitting"
                 >
-                  发布评论
+                  {{ $t('comment.submitReview') }}
                 </el-button>
               </template>
             </el-dialog>
@@ -207,7 +207,7 @@
 
           <el-col :xs="24" :md="12">
             <div class="map-section">
-              <h3>位置</h3>
+              <h3>{{ $t('site.location') }}</h3>
               <div id="detail-map" style="height: 400px;"></div>
             </div>
           </el-col>
@@ -215,7 +215,7 @@
       </div>
     </el-card>
 
-    <el-empty v-else-if="!loading" description="地点不存在" />
+    <el-empty v-else-if="!loading" :description="$t('site.doesNotExist')" />
   </div>
 </template>
 
@@ -231,6 +231,8 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
+// 评分文本
+const ratingTexts = computed(() => t('comment.ratingTexts'));
 
 // 判断是否可以删除评论
 const canDeleteComment = (comment) => {
@@ -242,20 +244,19 @@ const canDeleteComment = (comment) => {
 // 删除评论
 const handleDeleteComment = async (commentId) => {
   try {
-    await ElMessageBox.confirm('确定要删除这条评论吗？', '删除确认', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('comment.deleteConfirm'), t('common.delete'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning',
     });
 
     await deleteComment(commentId);
-    ElMessage.success('评论已删除');
+    ElMessage.success(t('comment.deleteSuccess'));
     
-    // 重新获取评论
     await fetchComments();
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败');
+      ElMessage.error(t('comment.deleteError'));
     }
   }
 };
@@ -314,12 +315,12 @@ const fetchComments = async () => {
 // 提交评论
 const submitComment = async () => {
   if (!newComment.value.rating) {
-    ElMessage.warning('请选择评分');
+    ElMessage.warning(t('comment.ratingRequired'));
     return;
   }
   
   if (!newComment.value.text.trim()) {
-    ElMessage.warning('请输入评论内容');
+    ElMessage.warning(t('comment.contentRequired'));
     return;
   }
   
@@ -330,16 +331,14 @@ const submitComment = async () => {
       text: newComment.value.text.trim()
     });
     
-    ElMessage.success('评论发布成功');
+    ElMessage.success(t('comment.submitSuccess'));
     showCommentDialog.value = false;
     
-    // 重置表单
     newComment.value = { rating: 5, text: '' };
     
-    // 重新获取评论
     await fetchComments();
   } catch (error) {
-    const message = error.response?.data?.error || '发布失败';
+    const message = error.response?.data?.error || t('comment.submitError');
     ElMessage.error(message);
   } finally {
     submitting.value = false;
@@ -349,7 +348,8 @@ const submitComment = async () => {
 // 格式化日期
 const formatDate = (dateString) => {
   if (!dateString) return '';
-  return new Date(dateString).toLocaleString('zh-CN', {
+  const locale = t('locale') === 'zh' ? 'zh-CN' : t('locale') === 'de' ? 'de-DE' : 'en-US';
+  return new Date(dateString).toLocaleString(locale, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

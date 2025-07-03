@@ -33,8 +33,43 @@
     "nearbyCategory": "Current Category",
     "transportInfo": {
       "walking": "Walking: {time} minutes",
-      "transit": "Transit: {time} minutes", 
+      "transit": "Transit: {time} minutes",
       "reachable": "Reachable: {distance} km"
+    },
+    "legend": {
+      "title": "Cultural Site Categories",
+      "youAreHere": "You are here"
+    },
+    "getLocation": "Get current location",
+    "locationNotSupported": "Browser does not support geolocation",
+    "gettingLocation": "Getting location...",
+    "locationFailed": "Failed to get location, please check location permission",
+    "savingLocation": "Saving location...",
+    "exitMode": "Please exit {mode} mode first",
+    "popup": {
+      "category": "Category",
+      "address": "Address",
+      "distance": "Distance",
+      "meters": "{distance} meters",
+      "collect": "Collect",
+      "collected": "Collected",
+      "tooFar": "Too Far",
+      "favorite": "Favorite",
+      "favorited": "Favorited",
+      "viewDetails": "View Details"
+    },
+    "timeMarks": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "20min": "20 min",
+      "30min": "30 min"
+    },
+    "radiusMarks": {
+      "500m": "500m",
+      "1km": "1km",
+      "2km": "2km",
+      "5km": "5km"
     }
   },
   "site": {
@@ -60,7 +95,10 @@
     "publicArtInfo": "Public Art Information",
     "publicArtDesc": "This is an outdoor artwork showcasing the city's creativity and cultural vitality.",
     "restaurantInfo": "Restaurant Information",
-    "restaurantDesc": "Taste delicious cuisine and experience local and international food culture."
+    "restaurantDesc": "Taste delicious cuisine and experience local and international food culture.",
+    "basicInfo": "Basic Information",
+    "location": "Location",
+    "doesNotExist": "Site does not exist"
   },
   "auth": {
     "username": "Username",
@@ -82,7 +120,14 @@
     "currentLocation": "Current Location",
     "notSet": "Not set",
     "latitude": "Latitude",
-    "longitude": "Longitude"
+    "longitude": "Longitude",
+    "usernameOrEmail": "Username or Email",
+    "enterUsernameOrEmail": "Please enter username or email",
+    "enterPassword": "Please enter password",
+    "enterUsername": "Please enter username",
+    "enterEmail": "Please enter email",
+    "enterPasswordHint": "Please enter password (at least 6 characters)",
+    "confirmPasswordPlaceholder": "Please enter password again"
   },
   "validation": {
     "required": "This field is required",
@@ -91,14 +136,25 @@
     "passwordMatch": "Passwords do not match",
     "loginFailed": "Invalid username or password",
     "registerFailed": "Registration failed",
-    "updateFailed": "Update failed"
+    "updateFailed": "Update failed",
+    "usernameOrEmailRequired": "Please enter username or email",
+    "passwordRequired": "Please enter password",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "usernameRequired": "Please enter username",
+    "usernameLength": "Username must be between 3 and 20 characters",
+    "emailRequired": "Please enter email",
+    "emailFormat": "Please enter a valid email format",
+    "passwordMismatch": "Passwords do not match!",
+    "confirmPasswordRequired": "Please enter password again"
   },
   "profile": {
     "title": "Profile",
     "updatePassword": "Change Password",
     "saveChanges": "Save Changes",
     "reset": "Reset",
-    "changePassword": "Change Password"
+    "changePassword": "Change Password",
+    "passwordPlaceholder": "Leave blank if not changing password",
+    "newPasswordPlaceholder": "At least 6 characters"
   },
   "favorites": {
     "title": "My Favorites",
@@ -107,7 +163,8 @@
     "addedAt": "Favorited at",
     "viewOnMap": "View on Map",
     "remove": "Remove",
-    "removeConfirm": "Remove from favorites?"
+    "removeConfirm": "Remove from favorites?",
+    "viewDetails": "View Details"
   },
   "footprints": {
     "title": "My Footprints",
@@ -128,7 +185,16 @@
     "cardView": "Card View",
     "mapView": "Map View",
     "timeline": "Timeline",
-    "deleteConfirm": "Delete this footprint? (Test only)"
+    "deleteConfirm": "Delete this footprint? (Test only)",
+    "viewOnMap": "View on Map",
+    "viewDetails": "View Details",
+    "deleteTest": "Delete (Test)",
+    "startExploring": "Start your exploration journey!",
+    "firstExploreDesc": "Collect 1st place",
+    "cityWandererDesc": "Collect 25 places",
+    "culturalAmbassadorDesc": "Collect 100 places",
+    "meters": "{distance} meters",
+    "category": "Category"
   },
   "comment": {
     "title": "User Reviews",
@@ -147,7 +213,8 @@
     "contentRequired": "Please enter review content",
     "submitSuccess": "Review submitted successfully",
     "deleteConfirm": "Are you sure to delete this review?",
-    "deleteSuccess": "Review deleted successfully"
+    "deleteSuccess": "Review deleted successfully",
+    "ratingTexts": ["Very Poor", "Poor", "Average", "Good", "Excellent"]
   },
   "admin": {
     "userManagement": "User Management",
@@ -189,7 +256,20 @@
     "rating": "Rating",
     "content": "Content",
     "commentTime": "Comment Time",
-    "commenter": "User"
+    "commenter": "User",
+    "deleteConfirmTitle": "Delete Confirmation",
+    "confirmButtonText": "Confirm",
+    "cancelButtonText": "Cancel",
+    "fetchError": "Failed to fetch user list",
+    "deleteSuccess": "Delete successful",
+    "deleteError": "Delete failed",
+    "viewSite": "View Site",
+    "reviewContent": "Review Content",
+    "fetchCommentsError": "Failed to fetch comment list",
+    "batchDeleteConfirm": "Are you sure to delete {count} selected comments?",
+    "batchDeleteConfirmTitle": "Batch Delete Confirmation",
+    "batchDeleteSuccess": "Batch delete successful",
+    "batchDeleteError": "Batch delete failed"
   },
   "messages": {
     "welcome": "Welcome to Chemnitz Cultural Map",
@@ -204,7 +284,22 @@
     "locationRequired": "Please get current location first",
     "locationFailed": "Failed to get location, please check location permission",
     "nearbyModeOn": "Nearby mode enabled, scan radius {radius} meters",
-    "tenMinuteModeOn": "10-minute city mode enabled, reachable range {distance} km"
+    "tenMinuteModeOn": "10-minute city mode enabled, reachable range {distance} km",
+    "radiusUpdated": "Scan radius updated to {radius} meters",
+    "travelTimeUpdated": "Travel time updated to {time} minutes, reachable range {distance} km",
+    "loginFirst": "Please login first",
+    "registerFailed": "Registration failed",
+    "loginFailed": "Login failed", 
+    "updateFailed": "Update failed",
+    "favoriteFailed": "Failed to favorite",
+    "unfavoriteFailed": "Failed to unfavorite",
+    "collectFailed": "Collection failed",
+    "locationError": "Unable to get current location",
+    "footprintDeleted": "Footprint deleted",
+    "deleteFailed": "Delete failed",
+    "milestoneTitle": "🎉 Congratulations on reaching a milestone!",
+    "milestoneMessage": "You have earned your {count}th medal!",
+    "tooFarMessage": "Too far away (current distance: {distance} meters)"
   },
   "about": {
     "title": "About Chemnitz Cultural Map",
@@ -217,7 +312,10 @@
       "title": "Feature Guide",
       "mapBrowsing": {
         "title": "Map Browsing",
-        "desc": "Interactive map shows all cultural sites with color-coded categories for easy identification"
+        "desc": "Interactive map shows all cultural sites with color-coded categories for easy identification",
+        "specialModes": {
+          "desc": "Nearby mode and 10-minute city mode for personalized exploration"
+        }
       },
       "searchFilter": {
         "title": "Search & Filter",
@@ -277,6 +375,21 @@
   },
   "common": {
     "step": "Step",
-    "documentation": "Documentation"
+    "documentation": "Documentation",
+    "or": "or",
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete"
+  },
+  "locale": "en",
+  "errors": {
+    "loadCategoriesFailed": "Failed to load categories",
+    "loadSitesFailed": "Failed to fetch sites",
+    "fetchFavoritesFailed": "Failed to fetch favorites",
+    "checkFavoriteStatusFailed": "Failed to check favorite status",
+    "fetchFootprintsFailed": "Failed to fetch footprints",
+    "fetchStatsFailed": "Failed to fetch statistics",
+    "checkCollectionStatusFailed": "Failed to check collection status"
   }
 }

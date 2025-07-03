@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', {
         ElMessage.success(i18n.global.t('messages.registerSuccess'));
         return { success: true };
       } catch (error) {
-        const message = error.response?.data?.error || '注册失败';
+        const message = error.response?.data?.error || i18n.global.t('messages.registerFailed');
         ElMessage.error(message);
         return { success: false, error: message };
       }
@@ -52,7 +52,7 @@ export const useAuthStore = defineStore('auth', {
         ElMessage.success(i18n.global.t('messages.loginSuccess'));
         return { success: true };
       } catch (error) {
-        const message = error.response?.data?.error || '登录失败';
+        const message = error.response?.data?.error || i18n.global.t('messages.loginFailed');
         ElMessage.error(message);
         return { success: false, error: message };
       }
@@ -81,7 +81,7 @@ export const useAuthStore = defineStore('auth', {
         ElMessage.success(i18n.global.t('messages.updateSuccess'));
         return { success: true };
       } catch (error) {
-        const message = error.response?.data?.error || '更新失败';
+        const message = error.response?.data?.error || i18n.global.t('messages.updateFailed');
         ElMessage.error(message);
         return { success: false, error: message };
       }

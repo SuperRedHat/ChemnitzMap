@@ -2,12 +2,40 @@
 import axios from 'axios';
 import config from './config';
 
-// 默认 baseURL 指向后端
-// 使用配置中的基础URL
+// 创建 axios 实例
 export const http = axios.create({
   baseURL: config.API_BASE_URL,
   timeout: 5000
 });
+
+// 延迟设置拦截器的函数，避免循环依赖
+export const setupInterceptors = () => {
+  // 动态导入 i18n
+  import('@/locales').then(({ default: i18n }) => {
+    // 请求拦截器
+    http.interceptors.request.use(config => {
+      // 从 localStorage 获取 token
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      
+      // 添加语言头
+      config.headers['Accept-Language'] = i18n.global.locale.value;
+      
+      return config;
+    });
+
+    // 响应拦截器（可选，用于统一错误处理）
+    http.interceptors.response.use(
+      response => response,
+      error => {
+        // 这里可以添加统一的错误处理
+        return Promise.reject(error);
+      }
+    );
+  });
+};
 
 // 获取所有分类
 export function fetchCategories() {
@@ -22,10 +50,10 @@ export function fetchSites({ category, q } = {}) {
   return http.get('/sites', { params }).then(res => res.data);
 }
 
-// 获取单个地标详情（后面用到）
-// export function fetchSiteDetail(id) {
-//   return http.get(`/sites/${id}`).then(res => res.data);
-// }
+// 获取单个地标详情
+export function fetchSiteDetail(id) {
+  return http.get(`/sites/${id}`).then(res => res.data);
+}
 
 // 获取地点评论
 export function fetchSiteComments(siteId, params = {}) {

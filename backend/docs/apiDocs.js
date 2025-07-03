@@ -1,14 +1,37 @@
 /**
  * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [System]
+ *     responses:
+ *       200:
+ *         description: Service is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: ok
+ */
+
+/**
+ * @swagger
  * tags:
- *   - name: 用户管理
- *     description: 用户相关操作
- *   - name: 分类管理
- *     description: 文化地点分类
- *   - name: 地点管理
- *     description: 文化地点信息
- *   - name: 收藏管理
- *     description: 用户收藏功能
+ *   - name: Users
+ *     description: User authentication and management
+ *   - name: Categories
+ *     description: Cultural site categories
+ *   - name: Sites
+ *     description: Cultural site information
+ *   - name: Favorites
+ *     description: User favorites management
+ *   - name: Footprints
+ *     description: User collection records
+ *   - name: Comments
+ *     description: Site reviews and ratings
  */
 
 /**
@@ -20,74 +43,74 @@
  *       properties:
  *         id:
  *           type: integer
- *           description: 用户ID
+ *           description: User ID
  *         username:
  *           type: string
- *           description: 用户名
+ *           description: Username
  *         email:
  *           type: string
- *           description: 邮箱
+ *           description: Email address
  *         role:
  *           type: string
  *           enum: [user, admin]
- *           description: 用户角色
+ *           description: User role
  *         current_lat:
  *           type: number
- *           description: 当前纬度
+ *           description: Current latitude
  *         current_lon:
  *           type: number
- *           description: 当前经度
+ *           description: Current longitude
  *         deleted:
  *           type: boolean
- *           description: 是否已删除
+ *           description: Soft deleted status
  *         created_at:
  *           type: string
  *           format: date-time
- *           description: 创建时间
+ *           description: Registration time
  *     
  *     Category:
  *       type: object
  *       properties:
  *         id:
  *           type: integer
- *           description: 分类ID
+ *           description: Category ID
  *         name:
  *           type: string
- *           description: 分类名称
+ *           description: Category name
  *         color:
  *           type: string
- *           description: 分类颜色（HEX格式）
+ *           description: Category color (HEX format)
  *     
  *     Site:
  *       type: object
  *       properties:
  *         id:
  *           type: integer
- *           description: 地点ID
+ *           description: Site ID
  *         name:
  *           type: string
- *           description: 地点名称
+ *           description: Site name
  *         address:
  *           type: string
- *           description: 地址
+ *           description: Address
  *         lat:
  *           type: number
- *           description: 纬度
+ *           description: Latitude
  *         lon:
  *           type: number
- *           description: 经度
+ *           description: Longitude
  *         category_id:
  *           type: integer
- *           description: 分类ID
+ *           description: Category ID
  *         category:
  *           type: string
- *           description: 分类名称
+ *           description: Category name
  *         color:
  *           type: string
- *           description: 分类颜色
+ *           description: Category color
  *         description:
  *           type: string
- *           description: 描述信息
+ *           description: Site description
  *         osm_id:
  *           type: string
  *           description: OpenStreetMap ID
@@ -97,37 +120,156 @@
  *       properties:
  *         id:
  *           type: integer
- *           description: 地点ID
+ *           description: Site ID
  *         name:
  *           type: string
- *           description: 地点名称
+ *           description: Site name
  *         address:
  *           type: string
- *           description: 地址
+ *           description: Address
  *         lat:
  *           type: number
- *           description: 纬度
+ *           description: Latitude
  *         lon:
  *           type: number
- *           description: 经度
+ *           description: Longitude
  *         category:
  *           type: string
- *           description: 分类名称
+ *           description: Category name
  *         color:
  *           type: string
- *           description: 分类颜色
+ *           description: Category color
  *         favorited_at:
  *           type: string
  *           format: date-time
- *           description: 收藏时间
+ *           description: Favorite time
+ *     
+ *     Footprint:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: Footprint ID
+ *         site_id:
+ *           type: integer
+ *           description: Site ID
+ *         name:
+ *           type: string
+ *           description: Site name
+ *         address:
+ *           type: string
+ *           description: Address
+ *         lat:
+ *           type: number
+ *           description: Site latitude
+ *         lon:
+ *           type: number
+ *           description: Site longitude
+ *         category:
+ *           type: string
+ *           description: Category name
+ *         color:
+ *           type: string
+ *           description: Category color
+ *         distance:
+ *           type: number
+ *           description: Collection distance (meters)
+ *         collected_at:
+ *           type: string
+ *           format: date-time
+ *           description: Collection time
+ *     
+ *     FootprintStats:
+ *       type: object
+ *       properties:
+ *         total:
+ *           type: integer
+ *           description: Total collected sites
+ *         totalSites:
+ *           type: integer
+ *           description: Total available sites
+ *         percentage:
+ *           type: string
+ *           description: Collection percentage
+ *         medals:
+ *           type: integer
+ *           description: Medals earned (1 per 5 sites)
+ *         nextMilestoneProgress:
+ *           type: integer
+ *           description: Progress to next medal (0-4)
+ *         categoryStats:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *               count:
+ *                 type: integer
+ *         achievements:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               icon:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               progress:
+ *                 type: string
+ *     
+ *     Comment:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: Comment ID
+ *         user_id:
+ *           type: integer
+ *           description: User ID
+ *         username:
+ *           type: string
+ *           description: Username
+ *         site_id:
+ *           type: integer
+ *           description: Site ID
+ *         site_name:
+ *           type: string
+ *           description: Site name
+ *         rating:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 5
+ *           description: Rating (1-5 stars)
+ *         text:
+ *           type: string
+ *           description: Comment content
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *           description: Comment time
+ *     
+ *     Error:
+ *       type: object
+ *       properties:
+ *         error:
+ *           type: string
+ *           description: Error message
+ *     
+ *     Success:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           description: Success message
  */
 
 /**
  * @swagger
  * /users/register:
  *   post:
- *     summary: 用户注册
- *     tags: [用户管理]
+ *     summary: User registration
+ *     tags: [Users]
  *     requestBody:
  *       required: true
  *       content:
@@ -141,27 +283,42 @@
  *             properties:
  *               username:
  *                 type: string
- *                 description: 用户名（3-20字符）
+ *                 description: Username (3-20 characters)
  *               email:
  *                 type: string
  *                 format: email
- *                 description: 邮箱地址
+ *                 description: Email address
  *               password:
  *                 type: string
- *                 description: 密码（至少6位）
+ *                 description: Password (minimum 6 characters)
  *     responses:
  *       201:
- *         description: 注册成功
+ *         description: Registration successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 token:
+ *                   type: string
  *       400:
- *         description: 请求参数错误
+ *         description: Invalid parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 
 /**
  * @swagger
  * /users/login:
  *   post:
- *     summary: 用户登录
- *     tags: [用户管理]
+ *     summary: User login
+ *     tags: [Users]
  *     requestBody:
  *       required: true
  *       content:
@@ -174,13 +331,13 @@
  *             properties:
  *               emailOrUsername:
  *                 type: string
- *                 description: 用户名或邮箱
+ *                 description: Username or email
  *               password:
  *                 type: string
- *                 description: 密码
+ *                 description: Password
  *     responses:
  *       200:
- *         description: 登录成功
+ *         description: Login successful
  *         content:
  *           application/json:
  *             schema:
@@ -192,30 +349,37 @@
  *                   $ref: '#/components/schemas/User'
  *                 token:
  *                   type: string
+ *                   description: JWT token
  *       401:
- *         description: 用户名或密码错误
+ *         description: Invalid username or password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 
 /**
  * @swagger
  * /users/me:
  *   get:
- *     summary: 获取当前用户信息
- *     tags: [用户管理]
+ *     summary: Get current user information
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: 成功
+ *         description: Success
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
  *       401:
- *         description: 未认证
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
  *   put:
- *     summary: 更新当前用户信息
- *     tags: [用户管理]
+ *     summary: Update current user information
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -235,24 +399,39 @@
  *                 type: number
  *               currentPassword:
  *                 type: string
+ *                 description: Required when changing password
  *               newPassword:
  *                 type: string
+ *                 description: New password (minimum 6 characters)
  *     responses:
  *       200:
- *         description: 更新成功
+ *         description: Update successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid parameters
+ *       401:
+ *         description: Current password incorrect
  */
 
 /**
  * @swagger
  * /users:
  *   get:
- *     summary: 获取所有用户（管理员）
- *     tags: [用户管理]
+ *     summary: Get all users (admin only)
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: 成功
+ *         description: Success
  *         content:
  *           application/json:
  *             schema:
@@ -260,34 +439,36 @@
  *               items:
  *                 $ref: '#/components/schemas/User'
  *       403:
- *         description: 需要管理员权限
+ *         description: Admin permission required
  */
 
 /**
  * @swagger
  * /users/deleted/list:
  *   get:
- *     summary: 获取已删除用户列表（管理员）
- *     tags: [用户管理]
+ *     summary: Get deleted users list (admin only)
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: 成功
+ *         description: Success
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/User'
+ *       403:
+ *         description: Admin permission required
  */
 
 /**
  * @swagger
  * /users/{id}:
  *   delete:
- *     summary: 删除用户（软删除，管理员）
- *     tags: [用户管理]
+ *     summary: Delete user (soft delete, admin only)
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -296,25 +477,25 @@
  *         required: true
  *         schema:
  *           type: integer
- *         description: 用户ID
+ *         description: User ID
  *     responses:
  *       200:
- *         description: 删除成功
+ *         description: Delete successful
  *       400:
- *         description: 不能删除自己
+ *         description: Cannot delete own account
  *       403:
- *         description: 需要管理员权限
+ *         description: Admin permission required
  */
 
 /**
  * @swagger
  * /categories:
  *   get:
- *     summary: 获取所有分类
- *     tags: [分类管理]
+ *     summary: Get all categories
+ *     tags: [Categories]
  *     responses:
  *       200:
- *         description: 成功
+ *         description: Success
  *         content:
  *           application/json:
  *             schema:
@@ -327,22 +508,22 @@
  * @swagger
  * /sites:
  *   get:
- *     summary: 获取地点列表
- *     tags: [地点管理]
+ *     summary: Get sites list
+ *     tags: [Sites]
  *     parameters:
  *       - in: query
  *         name: category
  *         schema:
  *           type: string
- *         description: 按分类筛选
+ *         description: Filter by category
  *       - in: query
  *         name: q
  *         schema:
  *           type: string
- *         description: 搜索关键词
+ *         description: Search keyword
  *     responses:
  *       200:
- *         description: 成功
+ *         description: Success
  *         content:
  *           application/json:
  *             schema:
@@ -355,37 +536,37 @@
  * @swagger
  * /sites/{id}:
  *   get:
- *     summary: 获取地点详情
- *     tags: [地点管理]
+ *     summary: Get site details
+ *     tags: [Sites]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: integer
- *         description: 地点ID
+ *         description: Site ID
  *     responses:
  *       200:
- *         description: 成功
+ *         description: Success
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Site'
  *       404:
- *         description: 地点不存在
+ *         description: Site not found
  */
 
 /**
  * @swagger
  * /favorites:
  *   get:
- *     summary: 获取当前用户的收藏列表
- *     tags: [收藏管理]
+ *     summary: Get current user's favorites list
+ *     tags: [Favorites]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: 成功
+ *         description: Success
  *         content:
  *           application/json:
  *             schema:
@@ -398,8 +579,8 @@
  * @swagger
  * /favorites/{siteId}:
  *   post:
- *     summary: 添加收藏
- *     tags: [收藏管理]
+ *     summary: Add favorite
+ *     tags: [Favorites]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -408,17 +589,17 @@
  *         required: true
  *         schema:
  *           type: integer
- *         description: 地点ID
+ *         description: Site ID
  *     responses:
  *       201:
- *         description: 收藏成功
+ *         description: Favorite added
  *       400:
- *         description: 已经收藏过
+ *         description: Already favorited
  *       404:
- *         description: 地点不存在
+ *         description: Site not found
  *   delete:
- *     summary: 取消收藏
- *     tags: [收藏管理]
+ *     summary: Remove favorite
+ *     tags: [Favorites]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -427,20 +608,20 @@
  *         required: true
  *         schema:
  *           type: integer
- *         description: 地点ID
+ *         description: Site ID
  *     responses:
  *       200:
- *         description: 取消收藏成功
+ *         description: Favorite removed
  *       404:
- *         description: 未找到收藏记录
+ *         description: Favorite record not found
  */
 
 /**
  * @swagger
  * /favorites/check/{siteId}:
  *   get:
- *     summary: 检查是否已收藏
- *     tags: [收藏管理]
+ *     summary: Check if site is favorited
+ *     tags: [Favorites]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -449,10 +630,10 @@
  *         required: true
  *         schema:
  *           type: integer
- *         description: 地点ID
+ *         description: Site ID
  *     responses:
  *       200:
- *         description: 成功
+ *         description: Success
  *         content:
  *           application/json:
  *             schema:
@@ -460,6 +641,359 @@
  *               properties:
  *                 isFavorited:
  *                   type: boolean
+ */
+
+/**
+ * @swagger
+ * /footprints/{siteId}:
+ *   post:
+ *     summary: Collect a site (must be within 400m)
+ *     tags: [Footprints]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: siteId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Site ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - lat
+ *               - lon
+ *             properties:
+ *               lat:
+ *                 type: number
+ *                 description: User's current latitude
+ *               lon:
+ *                 type: number
+ *                 description: User's current longitude
+ *     responses:
+ *       201:
+ *         description: Collection successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 distance:
+ *                   type: number
+ *                   description: Collection distance in meters
+ *                 stats:
+ *                   $ref: '#/components/schemas/FootprintStats'
+ *       400:
+ *         description: Invalid request (too far, already collected, or missing location)
+ *       404:
+ *         description: Site not found
+ *   delete:
+ *     summary: Delete footprint (for testing)
+ *     tags: [Footprints]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: siteId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Site ID
+ *     responses:
+ *       200:
+ *         description: Delete successful
+ *       404:
+ *         description: Footprint not found
+ */
+
+/**
+ * @swagger
+ * /footprints:
+ *   get:
+ *     summary: Get user's all footprints
+ *     tags: [Footprints]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Footprint'
+ */
+
+/**
+ * @swagger
+ * /footprints/stats:
+ *   get:
+ *     summary: Get user's footprint statistics
+ *     tags: [Footprints]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/FootprintStats'
+ */
+
+/**
+ * @swagger
+ * /footprints/check/{siteId}:
+ *   get:
+ *     summary: Check if site is collected
+ *     tags: [Footprints]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: siteId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Site ID
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isCollected:
+ *                   type: boolean
+ *                 collectedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Collection time (if collected)
+ *                 distance:
+ *                   type: number
+ *                   description: Collection distance in meters (if collected)
+ */
+
+/**
+ * @swagger
+ * /comments/site/{siteId}:
+ *   get:
+ *     summary: Get site comments
+ *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: siteId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Site ID
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 5
+ *         description: Number of comments per page
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Offset for pagination
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 comments:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Comment'
+ *                 total:
+ *                   type: integer
+ *                   description: Total comments count
+ *                 avgRating:
+ *                   type: number
+ *                   description: Average rating
+ *                 ratingCount:
+ *                   type: integer
+ *                   description: Number of ratings
+ *   post:
+ *     summary: Add comment to site
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: siteId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Site ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - rating
+ *               - text
+ *             properties:
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *                 description: Rating (1-5 stars)
+ *               text:
+ *                 type: string
+ *                 description: Comment content
+ *     responses:
+ *       201:
+ *         description: Comment published
+ *       400:
+ *         description: Invalid input or already commented
+ */
+
+/**
+ * @swagger
+ * /comments/user/{userId}:
+ *   get:
+ *     summary: Get user's comments
+ *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Comment'
+ */
+
+/**
+ * @swagger
+ * /comments/{commentId}:
+ *   delete:
+ *     summary: Delete comment
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Comment ID
+ *     responses:
+ *       200:
+ *         description: Delete successful
+ *       403:
+ *         description: No permission to delete
+ *       404:
+ *         description: Comment not found
+ */
+
+/**
+ * @swagger
+ * /comments/all/list:
+ *   get:
+ *     summary: Get all comments (admin only)
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Items per page
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 comments:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Comment'
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *       403:
+ *         description: Admin permission required
+ */
+
+/**
+ * @swagger
+ * /comments/batch-delete:
+ *   post:
+ *     summary: Batch delete comments (admin only)
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - commentIds
+ *             properties:
+ *               commentIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 description: Array of comment IDs to delete
+ *     responses:
+ *       200:
+ *         description: Batch delete successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Invalid input
+ *       403:
+ *         description: Admin permission required
  */
 
 module.exports = {};

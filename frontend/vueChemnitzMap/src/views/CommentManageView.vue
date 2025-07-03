@@ -8,26 +8,26 @@
       >
         <el-menu-item index="/admin">
           <el-icon><User /></el-icon>
-          <span>用户管理</span>
+          <span>{{ $t('admin.userManagement') }}</span>
         </el-menu-item>
         <el-menu-item index="/admin/comments">
           <el-icon><ChatLineSquare /></el-icon>
-          <span>评论管理</span>
+          <span>{{ $t('admin.commentManagement') }}</span>
         </el-menu-item>
       </el-menu>
     </div>
     
     <el-card>
       <template #header>
-        <h2>评论管理</h2>
+        <h2>{{ $t('admin.commentManagement') }}</h2>
       </template>
 
       <!-- 批量操作栏 -->
       <div class="batch-actions" v-if="selectedComments.length > 0">
         <el-button type="danger" @click="handleBatchDelete">
-          批量删除 ({{ selectedComments.length }})
+          {{ $t('admin.batchDelete', { count: selectedComments.length }) }}
         </el-button>
-        <el-button @click="clearSelection">清除选择</el-button>
+        <el-button @click="clearSelection">{{ $t('admin.clearSelection') }}</el-button>
       </div>
 
       <!-- 评论表格 -->
@@ -39,8 +39,8 @@
       >
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="username" label="用户" width="120" />
-        <el-table-column prop="site_name" label="地点" min-width="150">
+        <el-table-column prop="username" :label="$t('admin.commenter')" width="120" />
+        <el-table-column prop="site_name" :label="$t('admin.site')" min-width="150">
           <template #default="scope">
             <el-link 
               type="primary" 
@@ -50,7 +50,7 @@
             </el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="rating" label="评分" width="150">
+        <el-table-column prop="rating" :label="$t('admin.rating')" width="150">
           <template #default="scope">
             <el-rate 
               :model-value="scope.row.rating" 
@@ -59,24 +59,24 @@
             />
           </template>
         </el-table-column>
-        <el-table-column prop="text" label="评论内容" min-width="200">
+        <el-table-column prop="text" :label="$t('admin.content')" min-width="200">
           <template #default="scope">
             <el-text line-clamp="2">{{ scope.row.text }}</el-text>
           </template>
         </el-table-column>
-        <el-table-column prop="created_at" label="评论时间" width="180">
+        <el-table-column prop="created_at" :label="$t('admin.commentTime')" width="180">
           <template #default="scope">
             {{ formatDate(scope.row.created_at) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100" fixed="right">
+        <el-table-column :label="$t('admin.operations')" width="100" fixed="right">
           <template #default="scope">
             <el-button
               type="danger"
               size="small"
               @click="handleDelete(scope.row.id)"
             >
-              删除
+              {{ $t('admin.delete') }}
             </el-button>
           </template>
         </el-table-column>
@@ -88,7 +88,7 @@
         v-model:page-size="pageSize"
         :page-sizes="[10, 20, 50, 100]"
         :total="total"
-        layout="total, sizes, prev, pager, next, jumper"
+        :layout="`total, sizes, prev, pager, next, jumper`"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         style="margin-top: 20px"
@@ -102,7 +102,9 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { fetchAllComments, deleteComment, batchDeleteComments } from '@/api';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const router = useRouter();
 const comments = ref([]);
 const loading = ref(false);
@@ -119,7 +121,8 @@ const handleMenuSelect = (index) => {
 // 格式化日期
 const formatDate = (dateString) => {
   if (!dateString) return '';
-  return new Date(dateString).toLocaleString('zh-CN');
+  const locale = t('locale') === 'zh' ? 'zh-CN' : t('locale') === 'de' ? 'de-DE' : 'en-US';
+  return new Date(dateString).toLocaleString(locale);
 };
 
 // 获取评论列表
@@ -133,7 +136,7 @@ const fetchComments = async () => {
     comments.value = data.comments;
     total.value = data.total;
   } catch (error) {
-    ElMessage.error('获取评论列表失败');
+    ElMessage.error(t('admin.fetchCommentsError'));
   } finally {
     loading.value = false;
   }
@@ -152,18 +155,18 @@ const clearSelection = () => {
 // 删除单个评论
 const handleDelete = async (commentId) => {
   try {
-    await ElMessageBox.confirm('确定要删除这条评论吗？', '删除确认', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('comment.deleteConfirm'), t('admin.deleteConfirmTitle'), {
+      confirmButtonText: t('admin.confirmButtonText'),
+      cancelButtonText: t('admin.cancelButtonText'),
       type: 'warning',
     });
 
     await deleteComment(commentId);
-    ElMessage.success('删除成功');
+    ElMessage.success(t('comment.deleteSuccess'));
     fetchComments();
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败');
+      ElMessage.error(t('admin.deleteError'));
     }
   }
 };
@@ -172,22 +175,22 @@ const handleDelete = async (commentId) => {
 const handleBatchDelete = async () => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除选中的 ${selectedComments.value.length} 条评论吗？`,
-      '批量删除确认',
+      t('admin.batchDeleteConfirm', { count: selectedComments.value.length }),
+      t('admin.batchDeleteConfirmTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('admin.confirmButtonText'),
+        cancelButtonText: t('admin.cancelButtonText'),
         type: 'warning',
       }
     );
 
     await batchDeleteComments(selectedComments.value);
-    ElMessage.success('批量删除成功');
+    ElMessage.success(t('admin.batchDeleteSuccess'));
     clearSelection();
     fetchComments();
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('批量删除失败');
+      ElMessage.error(t('admin.batchDeleteError'));
     }
   }
 };
