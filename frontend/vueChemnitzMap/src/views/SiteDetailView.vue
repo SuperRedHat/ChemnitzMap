@@ -62,8 +62,8 @@
                 <div class="icon-info">
                   <span class="icon">🏛️</span>
                   <div>
-                    <h4>博物馆信息</h4>
-                    <p>探索丰富的历史文化收藏，了解艺术、科学和人类文明的精彩故事。</p>
+                    <h4>{{ $t('site.museumInfo') }}</h4>
+                    <p>{{ $t('site.museumDesc') }}</p>
                   </div>
                 </div>
               </div>
@@ -73,8 +73,8 @@
                 <div class="icon-info">
                   <span class="icon">🎨</span>
                   <div>
-                    <h4>公共艺术信息</h4>
-                    <p>这是一件户外艺术作品，展现了城市的创意和文化活力。</p>
+                    <h4>{{ $t('site.publicArtInfo') }}</h4>
+                    <p>{{ $t('site.publicArtDesc') }}</p>
                   </div>
                 </div>
               </div>
@@ -84,8 +84,8 @@
                 <div class="icon-info">
                   <span class="icon">🍽️</span>
                   <div>
-                    <h4>餐厅信息</h4>
-                    <p>品尝美味佳肴，体验当地和国际美食文化。</p>
+                    <h4>{{ $t('site.restaurantInfo') }}</h4>
+                    <p>{{ $t('site.restaurantDesc') }}</p>
                   </div>
                 </div>
               </div>
