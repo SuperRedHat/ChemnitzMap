@@ -1,0 +1,36 @@
+{
+  "name": "chemnitzmap",
+  "version": "1.0.0",
+  "description": "ChemnitzMap - Interactive Cultural Map of Chemnitz",
+  "private": true,
+  "scripts": {
+    "deploy": "node deploy.js",
+    "start": "node start.js",
+    "dev": "node start.js",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend/vueChemnitzMap && npm run dev",
+    "build": "cd frontend/vueChemnitzMap && npm run build",
+    "import-data": "cd backend && node scripts/importSites.js",
+    "update-data": "cd backend && node scripts/updateSites.js",
+    "create-admin": "cd backend && node scripts/createAdmin.js",
+    "postinstall": "npm run install:backend && npm run install:frontend",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend/vueChemnitzMap && npm install"
+  },
+  "keywords": [
+    "chemnitz",
+    "map",
+    "vue",
+    "nodejs",
+    "mysql"
+  ],
+  "author": "Yihong Zhai",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "mysql2": "^3.6.5"
+  }
+}
