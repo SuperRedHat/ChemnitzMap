@@ -1,6 +1,5 @@
 # 依赖文件 - 匹配所有子目录
 **/node_modules/
-**/package-lock.json
 
 # 环境变量文件
 **/.env
