@@ -1,0 +1,30 @@
+@'
+# 设置默认行为，如果 Git 认为文件是文本文件，则启用自动 CRLF 转换
+* text=auto
+
+# 明确标记哪些文件是文本文件，并且应该规范化行尾符
+*.js text eol=lf
+*.vue text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.sql text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# 明确标记哪些文件是二进制文件，不应该进行行尾符转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+
+# 特殊的 Windows 文件应该保持 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+'@ | Out-File -FilePath ".gitattributes" -Encoding UTF8
